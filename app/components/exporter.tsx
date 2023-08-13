@@ -1,9 +1,4 @@
-import {
-  ChatMessage,
-  useAppConfig,
-  useChatStore,
-  useWebsiteConfigStore,
-} from "../store";
+import { ChatMessage, useAppConfig, useChatStore } from "../store";
 import Locale from "../locales";
 import styles from "./exporter.module.scss";
 import { List, ListItem, Modal, Select, showToast } from "./ui-lib";
@@ -367,7 +362,6 @@ export function ImagePreviewer(props: {
   topic: string;
 }) {
   const chatStore = useChatStore();
-  const websiteConfigStore = useWebsiteConfigStore();
   const session = chatStore.currentSession();
   const mask = session.mask;
   const config = useAppConfig();
@@ -388,9 +382,6 @@ export function ImagePreviewer(props: {
           ])
           .then(() => {
             showToast(Locale.Copy.Success);
-          })
-          .catch((e) => {
-            console.error(e);
           });
       } catch (e) {
         console.error("[Copy Image] ", e);
@@ -446,11 +437,9 @@ export function ImagePreviewer(props: {
           </div>
 
           <div>
-            <div className={styles["main-title"]}>
-              {websiteConfigStore.title || "AI Chat"}
-            </div>
+            <div className={styles["main-title"]}>ChatGPT Next Web</div>
             <div className={styles["sub-title"]}>
-              {websiteConfigStore.subTitle || "github.com/Nanjiren01/AIChatWeb"}
+              github.com/Yidadaa/ChatGPT-Next-Web
             </div>
             <div className={styles["icons"]}>
               <ExportAvatar avatar={config.avatar} />

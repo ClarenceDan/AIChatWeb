@@ -324,15 +324,15 @@ export function Settings() {
   const hasNewVersion = currentVersion !== remoteId;
   const updateUrl = getClientConfig()?.isApp ? RELEASE_URL : UPDATE_URL;
 
-  // function checkUpdate(force = false) {
-  //   setCheckingUpdate(true);
-  //   updateStore.getLatestVersion(force).then(() => {
-  //     setCheckingUpdate(false);
-  //   });
+  function checkUpdate(force = false) {
+    setCheckingUpdate(true);
+    updateStore.getLatestVersion(force).then(() => {
+      setCheckingUpdate(false);
+    });
 
-  //   console.log("[Update] local version ", updateStore.version);
-  //   console.log("[Update] remote version ", updateStore.remoteVersion);
-  // }
+    console.log("[Update] local version ", updateStore.version);
+    console.log("[Update] remote version ", updateStore.remoteVersion);
+  }
 
   const usage = {
     used: updateStore.used,
@@ -358,13 +358,13 @@ export function Settings() {
   const customCount = promptStore.getUserPrompts().length ?? 0;
   const [shouldShowPromptModal, setShowPromptModal] = useState(false);
 
-  // const showUsage = accessStore.isAuthorized();
-  // useEffect(() => {
-  //   // checks per minutes
-  //   checkUpdate();
-  //   showUsage && checkUsage();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  const showUsage = accessStore.isAuthorized();
+  useEffect(() => {
+    // checks per minutes
+    checkUpdate();
+    showUsage && checkUsage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const keydownEvent = (e: KeyboardEvent) => {
@@ -407,7 +407,7 @@ export function Settings() {
       </div>
       <div className={styles["settings"]}>
         <List>
-          {/* <ListItem title={Locale.Settings.Avatar}>
+          <ListItem title={Locale.Settings.Avatar}>
             <Popover
               onClose={() => setShowEmojiPicker(false)}
               content={
@@ -427,8 +427,8 @@ export function Settings() {
                 <Avatar avatar={config.avatar} />
               </div>
             </Popover>
-          </ListItem> */}
-          {/*
+          </ListItem>
+
           <ListItem
             title={Locale.Settings.Update.Version(currentVersion ?? "unknown")}
             subTitle={
@@ -452,7 +452,7 @@ export function Settings() {
                 onClick={() => checkUpdate(true)}
               />
             )}
-          </ListItem> */}
+          </ListItem>
 
           <ListItem title={Locale.Settings.SendKey}>
             <Select
@@ -522,7 +522,7 @@ export function Settings() {
               }
             ></InputRange>
           </ListItem>
-          {/*
+
           <ListItem
             title={Locale.Settings.SendPreviewBubble.Title}
             subTitle={Locale.Settings.SendPreviewBubble.SubTitle}
@@ -537,8 +537,8 @@ export function Settings() {
                 )
               }
             ></input>
-          </ListItem> */}
-          {/*
+          </ListItem>
+
           <ListItem
             title={Locale.Settings.Mask.Title}
             subTitle={Locale.Settings.Mask.SubTitle}
@@ -554,10 +554,10 @@ export function Settings() {
                 )
               }
             ></input>
-          </ListItem> */}
+          </ListItem>
         </List>
 
-        {/* <List>
+        <List>
           {showAccessCode ? (
             <ListItem
               title={Locale.Settings.AccessCode.Title}
@@ -574,9 +574,9 @@ export function Settings() {
             </ListItem>
           ) : (
             <></>
-          )} */}
+          )}
 
-        {/* {!accessStore.hideUserApiKey ? (
+          {!accessStore.hideUserApiKey ? (
             <ListItem
               title={Locale.Settings.Token.Title}
               subTitle={Locale.Settings.Token.SubTitle}
@@ -590,8 +590,8 @@ export function Settings() {
                 }}
               />
             </ListItem>
-          ) : null} */}
-        {/*
+          ) : null}
+
           {!accessStore.hideBalanceQuery ? (
             <ListItem
               title={Locale.Settings.Usage.Title}
@@ -633,7 +633,7 @@ export function Settings() {
               ></input>
             </ListItem>
           ) : null}
-        </List> */}
+        </List>
 
         <List>
           <ListItem
@@ -678,15 +678,6 @@ export function Settings() {
               config.update((config) => (config.modelConfig = modelConfig));
             }}
           />
-        </List>
-
-        <List>
-          <ListItem
-            title={Locale.Settings.Version.Title}
-            subTitle={Locale.Settings.Version.SubTitle}
-          >
-            <span>v0.6</span>
-          </ListItem>
         </List>
 
         {shouldShowPromptModal && (

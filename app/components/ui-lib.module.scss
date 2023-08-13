@@ -201,12 +201,7 @@
   background-color: var(--white);
   color: var(--black);
   resize: none;
-  min-width: 180px;
-  box-sizing: border-box;
-}
-
-.input-left {
-  text-align: left;
+  min-width: 50px;
 }
 
 .select-with-icon {

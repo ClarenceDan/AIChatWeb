@@ -16,8 +16,6 @@ import { api, RequestMessage } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { estimateTokenLength } from "../utils/token";
-import { WebsiteConfigStore } from "./website";
-import { AuthStore } from "./auth";
 
 export type ChatMessage = RequestMessage & {
   date: string;
@@ -93,12 +91,7 @@ interface ChatStore {
   currentSession: () => ChatSession;
   nextSession: (delta: number) => void;
   onNewMessage: (message: ChatMessage) => void;
-  onUserInput: (
-    content: string,
-    websiteConfigStore: WebsiteConfigStore,
-    authStore: AuthStore,
-    navigateToLogin: () => void,
-  ) => Promise<void>;
+  onUserInput: (content: string) => Promise<void>;
   summarizeSession: () => void;
   updateStat: (message: ChatMessage) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
@@ -285,16 +278,9 @@ export const useChatStore = create<ChatStore>()(
         get().summarizeSession();
       },
 
-      async onUserInput(
-        content,
-        websiteConfigStore,
-        authStore,
-        navigateToLogin,
-      ) {
+      async onUserInput(content) {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
-        const sensitiveWordsTip = websiteConfigStore.sensitiveWordsTip;
-        const balanceNotEnough = websiteConfigStore.balanceNotEnough;
 
         const userContent = fillTemplateWith(content, modelConfig);
         console.log("[User Input] after template: ", userContent);
@@ -344,35 +330,7 @@ export const useChatStore = create<ChatStore>()(
           },
           onFinish(message) {
             botMessage.streaming = false;
-            let logout = false;
             if (message) {
-              try {
-                let jsonContent = JSON.parse(message);
-                if (jsonContent && jsonContent.code === 10302) {
-                  // 敏感词判断
-                  message = sensitiveWordsTip
-                    ? sensitiveWordsTip.replace(
-                        "${question}",
-                        jsonContent.message,
-                      )
-                    : Locale.Chat.SensitiveWordsTip(jsonContent.message);
-                } else if (jsonContent && jsonContent.code === 10401) {
-                  message = balanceNotEnough
-                    ? balanceNotEnough
-                    : Locale.Chat.BalanceNotEnough;
-                } else if (
-                  jsonContent &&
-                  (jsonContent.code === 10001 || jsonContent.code === 10002)
-                ) {
-                  logout = true;
-                  authStore.removeToken();
-                  message = Locale.Error.Unauthorized;
-                } else {
-                  message = prettyObject(jsonContent);
-                }
-              } catch (e) {
-                // ignore
-              }
               botMessage.content = message;
               get().onNewMessage(botMessage);
             }
@@ -380,9 +338,6 @@ export const useChatStore = create<ChatStore>()(
               sessionIndex,
               botMessage.id ?? messageIndex,
             );
-            if (logout) {
-              navigateToLogin();
-            }
           },
           onError(error) {
             const isAborted = error.message.includes("aborted");

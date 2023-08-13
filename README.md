@@ -1,538 +1,304 @@
-> 特别提醒：此项目应仅限于学习和交流使用，如若用于商业用途，请确保符合当地法律法规
+<div align="center">
+<img src="./docs/images/icon.svg" alt="icon"/>
 
-<div align="center" style="margin-bottom: 10px;">
-<img src="./docs/images/icon.svg" alt="logo"/>
-  
-<h1 align="center">AIChat Web</h1>
+<h1 align="center">ChatGPT Next Web</h1>
 
-**简体中文** | [English](#english)
+English / [简体中文](./README_CN.md)
 
-![](https://img.shields.io/badge/-Browser-purple?logo=microsoftedge)
-![](https://img.shields.io/badge/-MacOS%20&%20iOS-black?logo=apple)
-![](https://img.shields.io/badge/-Windows-blue?logo=windows)
-![](https://img.shields.io/badge/-Android-green?logo=android)
+One-Click to get well-designed cross-platform ChatGPT web UI.
 
-  <table>
-    <tbody>
-      <tr>
-        <td>
-         <a href="#一键部署">📝一键部署</a> 
-        </td>
-        <td>
-         <a href="https://nanjiren.online" target="_blank">🌏官方网站</a>
-        </td>
-        <td>
-         <a href="#演示站点">🎭演示站点</a>
-        </td>
-        <td> 
-         <a href="#项目优势">😍项目优势</a> 
-        </td>
-        <td>
-         <a href="#交流">💬合作交流</a>
-        </td>
-        <td> 
-         <a href="#ai好望角">👨‍👩‍👧‍👦社区论坛</a>
-        </td>
-        <td> 
-         <a href="#优秀案例">📕优秀案例</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+一键免费部署你的跨平台私人 ChatGPT 应用。
 
-![img](https://nanjiren.online/images/preview.png)
+[![Web][Web-image]][web-url]
+[![Windows][Windows-image]][download-url]
+[![MacOS][MacOS-image]][download-url]
+[![Linux][Linux-image]][download-url]
+
+[Web App](https://chatgpt.nextweb.fun/) / [Desktop App](https://github.com/Yidadaa/ChatGPT-Next-Web/releases) / [Issues](https://github.com/Yidadaa/ChatGPT-Next-Web/issues) / [Buy Me a Coffee](https://www.buymeacoffee.com/yidadaa)
+
+[网页版](https://chatgpt.nextweb.fun/) / [客户端](https://github.com/Yidadaa/ChatGPT-Next-Web/releases) / [反馈](https://github.com/Yidadaa/ChatGPT-Next-Web/issues) / [QQ 群](https://github.com/Yidadaa/ChatGPT-Next-Web/discussions/1724) / [打赏开发者](https://user-images.githubusercontent.com/16968934/227772541-5bcd52d8-61b7-488c-a203-0330d8006e2b.jpg)
+
+[web-url]: https://chatgpt.nextweb.fun
+[download-url]: https://github.com/Yidadaa/ChatGPT-Next-Web/releases
+[Web-image]: https://img.shields.io/badge/Web-PWA-orange?logo=microsoftedge
+[Windows-image]: https://img.shields.io/badge/-Windows-blue?logo=windows
+[MacOS-image]: https://img.shields.io/badge/-MacOS-black?logo=apple
+[Linux-image]: https://img.shields.io/badge/-Linux-333?logo=ubuntu
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FYidadaa%2FChatGPT-Next-Web&env=OPENAI_API_KEY&env=CODE&project-name=chatgpt-next-web&repository-name=ChatGPT-Next-Web)
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/Yidadaa/ChatGPT-Next-Web)
+
+![cover](./docs/images/cover.png)
 
 </div>
 
-本项目是在[ChatGPT-Next-Web](https://github.com/Yidadaa/ChatGPT-Next-Web.git)的基础上增加登录，注册等功能（注意，由于登录注册需要后台支持，因此本项目需要单独部署后端服务才可以运行）
+## Features
 
-> **本项目不再支持在vercel上进行完整部署**
+- **Deploy for free with one-click** on Vercel in under 1 minute
+- Compact client (~5MB) on Linux/Windows/MacOS, [download it now](https://github.com/Yidadaa/ChatGPT-Next-Web/releases)
+- Fully compatible with self-deployed llms, recommended for use with [RWKV-Runner](https://github.com/josStorer/RWKV-Runner) or [LocalAI](https://github.com/go-skynet/LocalAI)
+- Privacy first, all data stored locally in the browser
+- Markdown support: LaTex, mermaid, code highlight, etc.
+- Responsive design, dark mode and PWA
+- Fast first screen loading speed (~100kb), support streaming response
+- New in v2: create, share and debug your chat tools with prompt templates (mask)
+- Awesome prompts powered by [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh) and [awesome-chatgpt-prompts](https://github.com/f/awesome-chatgpt-prompts)
+- Automatically compresses chat history to support long conversations while also saving your tokens
+- I18n: English, 简体中文, 繁体中文, 日本語, Français, Español, Italiano, Türkçe, Deutsch, Tiếng Việt, Русский, Čeština, 한국어
 
-🧡💛💚💙💜🤎🖤🧡💛💚💙💜🤎🖤🧡💛💚💙💜🤎🧡💛💚💙💜🤎🖤🧡💛💚💙💜🤎🖤🧡💛💚
+## Roadmap
 
+- [x] System Prompt: pin a user defined prompt as system prompt [#138](https://github.com/Yidadaa/ChatGPT-Next-Web/issues/138)
+- [x] User Prompt: user can edit and save custom prompts to prompt list
+- [x] Prompt Template: create a new chat with pre-defined in-context prompts [#993](https://github.com/Yidadaa/ChatGPT-Next-Web/issues/993)
+- [x] Share as image, share to ShareGPT [#1741](https://github.com/Yidadaa/ChatGPT-Next-Web/pull/1741)
+- [x] Desktop App with tauri
+- [x] Self-host Model: Fully compatible with [RWKV-Runner](https://github.com/josStorer/RWKV-Runner), as well as server deployment of [LocalAI](https://github.com/go-skynet/LocalAI): llama/gpt4all/rwkv/vicuna/koala/gpt4all-j/cerebras/falcon/dolly etc.
+- [ ] Plugins: support network search, calculator, any other apis etc. [#165](https://github.com/Yidadaa/ChatGPT-Next-Web/issues/165)
 
-## 演示站点
+## What's New
 
-- 用户前台：[https://chat.nanjiren.online](https://chat.nanjiren.online)
-- 管理后台：[https://admin.nanjiren.online](https://admin.nanjiren.online)
+- 🚀 v2.0 is released, now you can create prompt templates, turn your ideas into reality! Read this: [ChatGPT Prompt Engineering Tips: Zero, One and Few Shot Prompting](https://www.allabtai.com/prompt-engineering-tips-zero-one-and-few-shot-prompting/).
+- 🚀 v2.7 let's share conversations as image, or share to ShareGPT!
+- 🚀 v2.8 now we have a client that runs across all platforms!
 
-**登录信息：**
-- 账号：aichat
-- 密码：aichatadmin
+## 主要功能
 
-> **温馨提示：由于后台开放，请勿在演示站中输入敏感信息。**
+- 在 1 分钟内使用 Vercel **免费一键部署**
+- 提供体积极小（~5MB）的跨平台客户端（Linux/Windows/MacOS）, [下载地址](https://github.com/Yidadaa/ChatGPT-Next-Web/releases)
+- 完整的 Markdown 支持：LaTex 公式、Mermaid 流程图、代码高亮等等
+- 精心设计的 UI，响应式设计，支持深色模式，支持 PWA
+- 极快的首屏加载速度（~100kb），支持流式响应
+- 隐私安全，所有数据保存在用户浏览器本地
+- 预制角色功能（面具），方便地创建、分享和调试你的个性化对话
+- 海量的内置 prompt 列表，来自[中文](https://github.com/PlexPt/awesome-chatgpt-prompts-zh)和[英文](https://github.com/f/awesome-chatgpt-prompts)
+- 自动压缩上下文聊天记录，在节省 Token 的同时支持超长对话
+- 多国语言支持：English, 简体中文, 繁体中文, 日本語, Español, Italiano, Türkçe, Deutsch, Tiếng Việt, Русский, Čeština
+- 拥有自己的域名？好上加好，绑定后即可在任何地方**无障碍**快速访问
 
-## 项目优势
+## 开发计划
 
-### 1、零基础，不会敲代码也可以搭建
+- [x] 为每个对话设置系统 Prompt [#138](https://github.com/Yidadaa/ChatGPT-Next-Web/issues/138)
+- [x] 允许用户自行编辑内置 Prompt 列表
+- [x] 预制角色：使用预制角色快速定制新对话 [#993](https://github.com/Yidadaa/ChatGPT-Next-Web/issues/993)
+- [x] 分享为图片，分享到 ShareGPT 链接 [#1741](https://github.com/Yidadaa/ChatGPT-Next-Web/pull/1741)
+- [x] 使用 tauri 打包桌面应用
+- [x] 支持自部署的大语言模型：开箱即用 [RWKV-Runner](https://github.com/josStorer/RWKV-Runner) ，服务端部署 [LocalAI 项目](https://github.com/go-skynet/LocalAI) llama / gpt4all / rwkv / vicuna / koala / gpt4all-j / cerebras / falcon / dolly 等等
+- [ ] 插件机制，支持联网搜索、计算器、调用其他平台 api [#165](https://github.com/Yidadaa/ChatGPT-Next-Web/issues/165)
 
-快速：项目提供一键部署脚本，采购服务器后只需执行一键部署脚本即可搭建，整个过程最快不超过3分钟。
+## 最新动态
 
-简单：部署后，进入提供的管理后台，即可定义自己站点的内容，无需修改任何代码，无需构建部署环节，即改即生效。
+- 🚀 v2.0 已经发布，现在你可以使用面具功能快速创建预制对话了！ 了解更多： [ChatGPT 提示词高阶技能：零次、一次和少样本提示](https://github.com/Yidadaa/ChatGPT-Next-Web/issues/138)。
+- 💡 想要更方便地随时随地使用本项目？可以试下这款桌面插件：https://github.com/mushan0x0/AI0x0.com
+- 🚀 v2.7 现在可以将会话分享为图片了，也可以分享到 ShareGPT 的在线链接。
+- 🚀 v2.8 发布了横跨 Linux/Windows/MacOS 的体积极小的客户端。
 
-### 2、高度自定义
+## Get Started
 
-项目提供方便易用，成熟稳定的管理后台（基于[vue-element-admin](https://panjiachen.github.io/vue-element-admin)），绝大部分内容可以在后台直接设定。
+> [简体中文 > 如何开始使用](./README_CN.md#开始使用)
 
-#### 2.1、网站标题、欢迎词、公告自定义
+1. Get [OpenAI API Key](https://platform.openai.com/account/api-keys);
+2. Click
+   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FYidadaa%2FChatGPT-Next-Web&env=OPENAI_API_KEY&env=CODE&project-name=chatgpt-next-web&repository-name=ChatGPT-Next-Web), remember that `CODE` is your page password;
+3. Enjoy :)
 
-①可以自定义网站标题，副标题；
-②可以自定义欢迎词，支持富文本格式，您可以在此处添加图片（例如二维码）进行引流；
-③可以编辑公告，同样支持富文本格式，您可以在此处展示使用声明、通知，可以选择是否开屏展示。
+## FAQ
 
-![网站标题、欢迎词、公告自定义](./docs/images/intro1.png)
+[简体中文 > 常见问题](./docs/faq-cn.md)
 
-#### 2.2、套餐玩法自定义
+[English > FAQ](./docs/faq-en.md)
 
-次卡？周卡？月卡？统统可以在后台定义。
+## Keep Updated
 
-![套餐](./docs/images/package.png)
+> [简体中文 > 如何保持代码更新](./README_CN.md#保持更新)
 
-![套餐后台配置](./docs/images/package2.png)
+If you have deployed your own project with just one click following the steps above, you may encounter the issue of "Updates Available" constantly showing up. This is because Vercel will create a new project for you by default instead of forking this project, resulting in the inability to detect updates correctly.
 
-#### 2.3、更多自定义内容
+We recommend that you follow the steps below to re-deploy:
 
-在后台管理中，您还可以设定注册方式（支持用户名+密码方式、图形验证码方式、邮箱注册方式），各页面主副标题，出现敏感词时的提示语，额度不足提示语……
+- Delete the original repository;
+- Use the fork button in the upper right corner of the page to fork this project;
+- Choose and deploy in Vercel again, [please see the detailed tutorial](./docs/vercel-cn.md).
 
-## 社区版功能
+### Enable Automatic Updates
 
-| 功能                                                      | 进度 |
-| --------------------------------------------------------- | -------- |
-| 用户管理                               |    ✔已完成(v0.0.1)     |
-| 额度管理                              |    ✔已完成(v0.1)     |
-| 注册额度赠送                       |    ✔已完成(v0.1)     |
-| 邮箱验证码注册    |    ✔已完成(v0.1)     |
-| 调用频率限制 |   ✔已完成(v0.1)       |
-| 图形验证码注册  |    ✔已完成(v0.2)     |
-| 网站标题                   |   ✔已完成(v0.2)      |
-| 套餐管理                            |   ✔已完成(v0.2)      |
-| 自定义敏感词拦截    |   ✔已完成(v0.2)   |
-| 忘记/重置密码                           |   ✔已完成(v0.4)   |
-| API KEY余额自动查询            |   ✔已完成(v0.4)   |
-| 忘记密码                           |   ✔已完成(v0.4)       |
-| 第三方API状态余额查询                                      |   ✔已完成(v0.6) |
-| 绘图功能                              |   进行中       |
+> If you encounter a failure of Upstream Sync execution, please manually sync fork once.
 
-## 专业版功能
+After forking the project, due to the limitations imposed by GitHub, you need to manually enable Workflows and Upstream Sync Action on the Actions page of the forked project. Once enabled, automatic updates will be scheduled every hour:
 
-| 功能                                                         | 进度     |
-| ------------------------------------------------------------ | -------- |
-| 社区版的全功能 | ✔        |
-| 仪表盘                                | ✔已完成(v0.3)  |
-| 对接支付系统            | ✔已接入虎皮椒、蓝兔(v0.3)，其他进行中   |
-| 邮件模板                                | ✔已完成(v0.5)  |
-| 邀请机制                                | ✔已完成(v0.5)  |
-| 微信登录                                | ✔已完成(v0.5)  |
-| 后台查看聊天记录                                | ✔已完成(v0.5)  |
-| 模型名称重映射                                | ✔已完成(v0.5)  |
-| 兑换码                                | ✔已完成(v0.7)  |
-| 面具管理                                | ✔已完成(v0.7)  |
-| 独立注册登录界面                                | ✔已完成(v0.7)  |
-| key余额协议配置                                | ✔已完成(v0.7)  |
-| 更多UI自定义                                | ✔已完成(v0.7)  |
-| 对接发卡平台          | 进行中   |
-| 多模型支持                         | 长期进行 |
+![Automatic Updates](./docs/images/enable-actions.jpg)
 
-## 预览
+![Enable Automatic Updates](./docs/images/enable-actions-sync.jpg)
 
-> 用户前台
-### 1、聊天
+### Manually Updating Code
 
-![聊天页](./docs/images/chat.png)
+If you want to update instantly, you can check out the [GitHub documentation](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) to learn how to synchronize a forked project with upstream code.
 
-### 2、登录
-![登录页](./docs/images/Login.png)
+You can star or watch this project or follow author to get release notifictions in time.
 
+## Access Password
 
-### 3、注册
-![注册页](./docs/images/Register.png)
+> [简体中文 > 如何增加访问密码](./README_CN.md#配置页面访问密码)
 
-### 4、个人中心
+This project provides limited access control. Please add an environment variable named `CODE` on the vercel environment variables page. The value should be passwords separated by comma like this:
 
-![个人中心](./docs/images/Profile.png)
+```
+code1,code2,code3
+```
 
-> 管理后台
+After adding or modifying this environment variable, please redeploy the project for the changes to take effect.
 
-### 1、会员列表
+## Environment Variables
 
-![成员列表](./docs/images/members.png)
+> [简体中文 > 如何配置 api key、访问密码、接口代理](./README_CN.md#环境变量)
 
-### 2、次数变动记录/手动添加次数
+### `OPENAI_API_KEY` (required)
 
-![次数变动记录](./docs/images/quota.png)
+Your openai api key.
 
-## 依赖
-本项目需要依赖特定的[**后端**](https://github.com/Nanjiren01/AIChatAdmin)，以及相应的[**管理后台前端项目**](https://github.com/Nanjiren01/AIChatConsole)。
+### `CODE` (optional)
 
-## 一键部署
+Access passsword, separated by comma.
 
-> 如果使用宝塔，请登录好望角参照内测专属频道获取教程
+### `BASE_URL` (optional)
 
-1. 在云厂商购买一台合适配置的服务器，操作系统选择CentOS 7.9（其他版本未测试）
-2. 在安全组中放行80端口和8080端口
-3. 连接云服务器，在命令行中运行以下代码
+> Default: `https://api.openai.com`
+
+> Examples: `http://your-openai-proxy.com`
+
+Override openai api request base url.
+
+### `OPENAI_ORG_ID` (optional)
+
+Specify OpenAI organization ID.
+
+### `HIDE_USER_API_KEY` (optional)
+
+> Default: Empty
+
+If you do not want users to input their own API key, set this value to 1.
+
+### `DISABLE_GPT4` (optional)
+
+> Default: Empty
+
+If you do not want users to use GPT-4, set this value to 1.
+
+### `HIDE_BALANCE_QUERY` (optional)
+
+> Default: Empty
+
+If you do not want users to query balance, set this value to 1.
+
+## Requirements
+
+NodeJS >= 18, Docker >= 20
+
+## Development
+
+> [简体中文 > 如何进行二次开发](./README_CN.md#开发)
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/Yidadaa/ChatGPT-Next-Web)
+
+Before starting development, you must create a new `.env.local` file at project root, and place your api key into it:
+
+```
+OPENAI_API_KEY=<your api key here>
+
+# if you are not able to access openai service, use this BASE_URL
+BASE_URL=https://chatgpt1.nextweb.fun/api/proxy
+```
+
+### Local Development
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/Nanjiren01/AIChatWeb/main/scripts/setup.sh)
+# 1. install nodejs and yarn first
+# 2. config local env vars in `.env.local`
+# 3. run
+yarn install
+yarn dev
 ```
 
-命令运行过程中，需要设置超级管理员的账号和密码（请将aichat888更改为自己的账号密码并牢记），如下所示：
+## Deployment
 
-```text
-Please input the super admin username. 
-Only letters and numbers are supported, the length should between 6 and 20, and they cannot start with a number.
-Username: aichat888
-Super Admin Username is valid.
-Please input the super admin password. 
-Only letters and numbers are supported, and the length should between 6 and 20. 
-You can change it on the web page after the Application running
-Password: aichat888
-Super Admin Password is valid.
-```
+> [简体中文 > 如何部署到私人服务器](./README_CN.md#部署)
 
-当出现以下提示，说明部署成功
+### Docker (Recommended)
 
 ```shell
-[+] Running 5/5
- ✔ Network root_default      Created
- ✔ Container aichat-db       Started
- ✔ Container aichat-admin    Started
- ✔ Container aichat-console  Started
- ✔ Container aichat-web      Started         
+docker pull yidadaa/chatgpt-next-web
+
+docker run -d -p 3000:3000 \
+   -e OPENAI_API_KEY="sk-xxxx" \
+   -e CODE="your-password" \
+   yidadaa/chatgpt-next-web
 ```
 
-稍等几秒钟应用初始化，即可打开http://IP访问前台页面，打开http://IP:8080访问后台服务。
-
-由于在命令行中设定的密码较为简单（只包含字母和数字），建议应用启动后，尽快进入后台修改超管密码。
-
-## 许可证 
-本仓库是基于仓库 [Yidadaa's ChatGPT-Next-Web](https://github.com/Yidadaa/ChatGPT-Next-Web) 的996许可证，以[MIT license](./LICENSE)的形式重新分发。
-
-## 交流
-
-> 加入QQ交流群、电报群、微信群获取更多内容
-
-QQ群：<a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=Z-vLdIURiLJW7IInTMfRPnjFF2w5biv9&jump_from=webapi&authKey=xwz1vwqsxZvdsYVqbs8jhUz85CnwKAnNq2MLmfAewdOvtgQrX99I1i3DpNx4AnM5" target="_blank">437863036</a>
-
-Telegram：<a target="_blank" href="https://t.me/aichatadmin">aichatadmin</a>
-
-<img src="./docs/images/QQ.jpeg" width="400px" alt="QQ" style="display: inline-block" />
-
-## AI好望角
-
-加入 **AI好望角-AIChat用户专属社区** 福利：
-- 免费获取AIChat pro版
-- 有可能获得免费定制服务
-- 优秀案例展示（需达到标准）
-- 高级教程（包括HTTPS搭建、域名注册、服务器购买、高级套餐页制作）
-- ChatGPT高级使用教程
-- 新功能优先体验
-
-> 当前项目为试运行阶段，部分内容仍在筹备中
-
-> AI好望角为本项目自建平台，目前仍在筹建中，只能以赞赏形式加入（不支持退款），赞赏后可立即进入AIChat专业版内测群获取专业版专属信息。
-> 新平台筹建完毕后，会将知识星球中的内容迁移至新平台，新用户无需进入星球。
-
-当前加入AI好望角价格仅为**￥218**，随着功能的不断完善，价格逐步提升
-
-<img src="https://nanjiren.online/images/qrcode.png" width="200px" alt="AI好望角"/>
-
-## 优秀案例
-
-### YOURS-AI
-网址：[https://junmao.shop/](https://junmao.shop/)
-用户：300+
-
-### NEU-GPT
-网址：[https://neu.zxyt.top/](https://neu.zxyt.top/)
-用户：150+
-
-### AI Ultra
-网址：[https://chat.wzunjh.top/](https://chat.wzunjh.top/)
-用户：1100+
-
-### AI佩奇
-网址：[https://candy666.top/](https://candy666.top/)
-用户：~1000
-
-### AI小老鼠
-网址：[https://chat.mice.pub](https://chat.mice.pub)
-用户：~1000
-
-## 专业版规划路线
-
-1. 对接支付系统
-2. 邀请机制（邀请赠送额度）
-3. 仪表盘（新增用户数曲线图、聊天数量曲线图）
-4. 对接发卡平台
-5. 服务端消息保存
-6. 多模型支持（Claude、Bard……）
-
-# English
-
-> **Special Reminder:** This project should be used for learning and communication purposes only. If you intend to use it for commercial purposes, please ensure compliance with local laws and regulations.
-
-<div align="center" style="margin-bottom: 10px;">
-<img src="./docs/images/icon.svg" alt="logo"/>
-
-<h1 align="center">AIChat Web</h1>
-
-![](https://img.shields.io/badge/-Browser-purple?logo=microsoftedge)
-![](https://img.shields.io/badge/-MacOS%20&%20iOS-black?logo=apple)
-![](https://img.shields.io/badge/-Windows-blue?logo=windows)
-![](https://img.shields.io/badge/-Android-green?logo=android)
-
-  <table>
-    <tbody>
-      <tr>
-        <td>
-         <a href="#one-click-deployment">📝Deployment</a>
-        </td>
-        <td>
-         <a href="https://nanjiren.online" target="_blank">🌏Website</a>
-        </td>
-        <td>
-         <a href="#demo">🎭Demo</a>
-        </td>
-        <td> 
-         <a href="#advantages">😍Advantages</a>
-        </td>
-        <td>
-         <a href="#communication">💬Communication</a>
-        </td>
-        <td> 
-         <a href="#ai-cape-of-good-hope">👨‍👩‍👧‍👦Forum</a>
-        </td>
-        <td> 
-         <a href="#excellent-cases">📕Examples</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-![img](https://nanjiren.online/images/preview.png)
-
-</div>
-
-This project is an extension of [ChatGPT-Next-Web](https://github.com/Yidadaa/ChatGPT-Next-Web.git) that includes features like login and registration. Please note that since login and registration require backend support, this project needs a separate deployment of backend services to run.
-
-> **This project no longer supports full deployment on Vercel**
-
-🧡💛💚💙💜🤎🖤🧡💛💚💙💜🤎🖤🧡💛💚💙💜🤎🧡💛💚💙💜🤎🖤🧡💛💚💙💜🤎🖤🧡💛💚
-
-## Demo
-
-- User Frontend: [https://chat.nanjiren.online](https://chat.nanjiren.online)
-- Admin Backend: [https://admin.nanjiren.online](https://admin.nanjiren.online)
-
-**Login Credentials:**
-- Username: aichat
-- Password: aichatadmin
-
-> **Note: As the backend is open for demonstration purposes, please refrain from entering sensitive information in the demo site.**
-
-## Advantages
-
-### 1. Zero coding experience required
-
-Quick: The project provides a one-click deployment script, allowing you to set up the project in less than 3 minutes after purchasing the server.
-
-Simple: Once deployed, you can access the provided admin panel to define the content of your website without any code modification. Changes take effect immediately without the need for building or deploying.
-
-### 2. Highly customizable
-
-The project offers a user-friendly and stable admin panel (based on [vue-element-admin](https://panjiachen.github.io/vue-element-admin)) that allows you to customize most aspects of your website.
-
-#### 2.1. Customizable website title, welcome message, and announcements
-
-①You can customize the website title and subtitle.
-②You can define a welcome message with support for rich text formatting. You can also add images (e.g., QR codes) to attract visitors.
-③You can edit announcements with rich text formatting as well. You can choose whether to display them on the splash screen.
-
-![Customizable website title, welcome message, and announcements](./docs/images/intro1.png)
-
-#### 2.2. Customizable package options
-
-Whether it's a one-time pass, weekly pass, or monthly pass, you can define all the package options in the admin panel.
-
-![Packages](./docs/images/package.png)
-
-![Package configuration in the admin panel](./docs/images/package2.png)
-
-#### 2.3. More customization options
-
-In the admin panel, you can also set the registration method (supporting username + password, graphical captcha, and email registration), main and sub-titles for each page, prompt messages for sensitive words, insufficient balance, and more.
-
-## Community Edition Features
-
-| Feature                                                     | Progress |
-| ----------------------------------------------------------- | -------- |
-| User Management                                            | ✔ Completed (v0.0.1) |
-| Quota Management                                           | ✔ Completed (v0.1) |
-| Registration Limit Gift                                    | ✔ Completed (v0.1) |
-| Email Verification Code Registration                       | ✔ Completed (v0.1) |
-| User-Based Call Frequency Limit                            | ✔ Completed (v0.1) |
-| Graphic Verification Code Registration                     | ✔ Completed (v0.2) |
-| Website Title Customization                                | ✔ Completed (v0.2) |
-| Package Management                                         | ✔ Completed (v0.2) |
-| Custom Sensitive Word Interception                         | ✔ Completed (v0.2) |
-| Reset Password                                             | ✔ Completed (v0.4) |
-| Auto Query Balance/Quota                                   | ✔ Completed (v0.4) |
-| Forgot Password                                            | ✔ Completed (v0.4) |
-| Third-Party API Status and Balance Query                    | ✔ Completed (v0.6) |
-| Drawing Function                                           | In Progress |
-
-## Professional Edition Features
-
-| Feature                                                     | Progress |
-| ----------------------------------------------------------- | -------- |
-| Full Functionality of the Community Version                 | ✔ Completed |
-| Advanced Dashboard                                         | ✔ Completed (v0.3) |
-| Integration with Payment System (Pay)                       | ✔ Integrated with Hupijiao and Lantu (v0.3), others in progress |
-| Email Template                                             | ✔ Completed (v0.5) |
-| Invitation Mechanism                                       | ✔ Completed (v0.5) |
-| Wechat Login                                               | ✔ Completed (v0.5) |
-| Chat Log Viewing                                           | ✔ Completed (v0.5) |
-| Model Name Map                                             | ✔ Completed (v0.5) |
-| Redeem Code                                                | ✔ Completed (v0.7) |
-| Mask Management                                            | ✔ Completed (v0.7) |
-| Independent Registration and Login Page                     | ✔ Completed (v0.7) |
-| API Key Balance Protocol Configuration                     | ✔ Completed (v0.7) |
-| More UI Customization                                      | ✔ Completed (v0.7) |
-| Integration with Card Issuing Platforms                     | In Progress |
-| Multiple Model Support                                     | Ongoing |
-
-## Preview
-
-> User Frontend
-### 1. Chat
-
-![Chat Page](./docs/images/chat.png)
-
-### 2. Login
-![Login Page](./docs/images/Login.png)
-
-
-### 3. Register
-![Register Page](./docs/images/Register.png)
-
-### 4. Profile
-
-![Profile Page](./docs/images/Profile.png)
-
-> Admin Backend
-
-### 1. Member List
-
-![Member List](./docs/images/members.png)
-
-### 2. Quota Change History / Manual Quota Addition
-
-![Quota Change History](./docs/images/quota.png)
-
-## Dependencies
-This project requires specific [**backend**](https://github.com/Nanjiren01/AIChatAdmin) and corresponding [**administration frontend project**](https://github.com/Nanjiren01/AIChatConsole).
-
-## One-Click Deployment
-
-> If you are using Baota, please refer to the exclusive beta channel in Haowangjiao for the tutorial.
-
-1. Purchase a suitable server from a cloud provider, and choose CentOS 7.9 as the operating system (other versions are not tested).
-2. Open port 80 and port 8080 in the security group of the server.
-3. Connect to the cloud server and run the following command in the command line:
+You can start service behind a proxy:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/Nanjiren01/AIChatWeb/main/scripts/setup.sh)
+docker run -d -p 3000:3000 \
+   -e OPENAI_API_KEY="sk-xxxx" \
+   -e CODE="your-password" \
+   -e PROXY_URL="http://localhost:7890" \
+   yidadaa/chatgpt-next-web
 ```
 
-During the execution of the command, you will be prompted to set the username and password for the super admin (please change "aichat888" to your own username and password and remember them), as shown below:
-
-```text
-Please input the super admin username. 
-Only letters and numbers are supported, the length should be between 6 and 20, and they cannot start with a number.
-Username: aichat888
-Super Admin Username is valid.
-Please input the super admin password. 
-Only letters and numbers are supported, and the length should be between 6 and 20. 
-You can change it on the web page after the application is running.
-Password: aichat888
-Super Admin Password is valid.
-```
-
-When you see the following prompt, it means the deployment is successful:
+If your proxy needs password, use:
 
 ```shell
-[+] Running 5/5
- ✔ Network root_default      Created
- ✔ Container aichat-db       Started
- ✔ Container aichat-admin    Started
- ✔ Container aichat-console  Started
- ✔ Container aichat-web      Started         
+-e PROXY_URL="http://127.0.0.1:7890 user pass"
 ```
 
-Wait a few seconds for the application to initialize. You can then open http://IP to access the frontend and http://IP:8080 to access the backend service.
+### Shell
 
-Since the password set in the command line is relatively simple (only contains letters and numbers), it is recommended to enter the backend as soon as possible after the application starts and change the password for the super admin.
+```shell
+bash <(curl -s https://raw.githubusercontent.com/Yidadaa/ChatGPT-Next-Web/main/scripts/setup.sh)
+```
 
-## License
-This repository is distributed under the MIT license, based on the repository [Yidadaa's ChatGPT-Next-Web](https://github.com/Yidadaa/ChatGPT-Next-Web) with the 996 License.
+## Screenshots
 
-## Communication
+![Settings](./docs/images/settings.png)
 
-> Join QQ group, Telegram group, WeChat group to get more content
+![More](./docs/images/more.png)
 
-QQ group: [437863036](https://qm.qq.com/cgi-bin/qm/qr?k=Z-vLdIURiLJW7IInTMfRPnjFF2w5biv9&jump_from=webapi&authKey=xwz1vwqsxZvdsYVqbs8jhUz85CnwKAnNq2MLmfAewdOvtgQrX99I1i3DpNx4AnM5)
+## Donation
 
-Telegram: [aichatadmin](https://t.me/aichatadmin)
+[Buy Me a Coffee](https://www.buymeacoffee.com/yidadaa)
 
-<img src="./docs/images/QQ.jpeg" width="400px" alt="QQ" style="display: inline-block" />
+## Special Thanks
 
-## AI Cape of Good Hope
+### Sponsor
 
-Join the **AI Cape of Good Hope - AIChat User Exclusive Community** and enjoy the following benefits:
-- Free access to AIChat Pro version
-- Possibility of receiving free customized services
-- Showcase of outstanding use cases (subject to meeting the standards)
-- Advanced tutorials (including HTTPS setup, domain registration, server purchase, advanced package page creation)
-- Advanced usage tutorials for ChatGPT
-- Priority access to new features
+> 仅列出捐赠金额 >= 100RMB 的用户。
 
-> The current project is in the trial phase, and some content is still under development.
+[@mushan0x0](https://github.com/mushan0x0)
+[@ClarenceDan](https://github.com/ClarenceDan)
+[@zhangjia](https://github.com/zhangjia)
+[@hoochanlon](https://github.com/hoochanlon)
+[@relativequantum](https://github.com/relativequantum)
+[@desenmeng](https://github.com/desenmeng)
+[@webees](https://github.com/webees)
+[@chazzhou](https://github.com/chazzhou)
+[@hauy](https://github.com/hauy)
+[@Corwin006](https://github.com/Corwin006)
+[@yankunsong](https://github.com/yankunsong)
+[@ypwhs](https://github.com/ypwhs)
+[@fxxxchao](https://github.com/fxxxchao)
+[@hotic](https://github.com/hotic)
+[@WingCH](https://github.com/WingCH)
+[@jtung4](https://github.com/jtung4)
+[@micozhu](https://github.com/micozhu)
+[@jhansion](https://github.com/jhansion)
+[@Sha1rholder](https://github.com/Sha1rholder)
+[@AnsonHyq](https://github.com/AnsonHyq)
+[@synwith](https://github.com/synwith)
 
-> AI Cape of Good Hope is a self-built platform for this project, which is currently under construction. Joining is only possible through appreciation (no refunds are supported). After showing your appreciation, you can immediately join the AIChat Pro beta group and gain access to exclusive information for the professional version.
-> Once the new platform is ready, the content from the Knowledge Planet will be migrated to the new platform, and new users will not need to join the Planet.
+### Contributor
 
-The current price to join AI Cape of Good Hope is only **￥218**. As the functionality continues to improve, the price will gradually increase.
+[Contributors](https://github.com/Yidadaa/ChatGPT-Next-Web/graphs/contributors)
 
-<img src="https://nanjiren.online/images/qrcode.png" width="200px" alt="AI Cape of Good Hope"/>
+## LICENSE
 
-## Excellent Cases
-
-### YOURS-AI
-Website: [https://junmao.shop/](https://junmao.shop/)
-Users: 300+
-
-### NEU-GPT
-Website: [https://neu.zxyt.top/](https://neu.zxyt.top/)
-Users: 150+
-
-### AI Ultra
-Website: [https://chat.wzunjh.top/](https://chat.wzunjh.top/)
-Users: 1100+
-
-### AI Peppa
-Website: [https://candy666.top/](https://candy666.top/)
-Users: ~1000
-
-### AI Little Mouse
-Website: [https://chat.mice.pub](https://chat.mice.pub)
-Users: ~1000
-
-## Professional Version Roadmap
-
-1. Integration with Pay payment system
-2. Invitation mechanism (invitations with bonus credits)
-3. Dashboard (graphs for new user count and chat volume)
-4. Integration with card issuing platform
-5. Server-side message storage
-6. Multi-model support (Claude, Bard, etc.)
+[Anti 996 License](https://github.com/kattgu7/Anti-996-License/blob/master/LICENSE_CN_EN)

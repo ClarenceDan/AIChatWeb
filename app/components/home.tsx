@@ -2,13 +2,12 @@
 
 require("../polyfill");
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 import styles from "./home.module.scss";
 
-import ChatBotIcon from "../icons/ai-chat-bot.png";
+import BotIcon from "../icons/bot.svg";
 import LoadingIcon from "../icons/three-dots.svg";
-import NextImage from "next/image";
 
 import { getCSSVar, useMobileScreen } from "../utils";
 
@@ -28,48 +27,17 @@ import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
 import { AuthPage } from "./auth";
 import { getClientConfig } from "../config/client";
-import { useWebsiteConfigStore, BOT_HELLO } from "../store";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
     <div className={styles["loading-content"] + " no-dark"}>
-      {!props.noLogo && (
-        <NextImage
-          src={ChatBotIcon.src}
-          width={30}
-          height={30}
-          alt="bot"
-          className="user-avatar"
-        />
-      )}
+      {!props.noLogo && <BotIcon />}
       <LoadingIcon />
     </div>
   );
 }
 
-const Login = dynamic(async () => (await import("./login")).Login, {
-  loading: () => <Loading noLogo />,
-});
-
-const Register = dynamic(async () => (await import("./register")).Register, {
-  loading: () => <Loading noLogo />,
-});
-const ForgetPassword = dynamic(
-  async () => (await import("./forget-password")).ForgetPassword,
-  {
-    loading: () => <Loading noLogo />,
-  },
-);
-
 const Settings = dynamic(async () => (await import("./settings")).Settings, {
-  loading: () => <Loading noLogo />,
-});
-
-const Profile = dynamic(async () => (await import("./profile")).Profile, {
-  loading: () => <Loading noLogo />,
-});
-
-const Pricing = dynamic(async () => (await import("./pricing")).Pricing, {
   loading: () => <Loading noLogo />,
 });
 
@@ -85,22 +53,8 @@ const MaskPage = dynamic(async () => (await import("./mask")).MaskPage, {
   loading: () => <Loading noLogo />,
 });
 
-export interface NoticeConfig {
-  show: boolean;
-  splash: boolean;
-  title: string;
-  content: string;
-}
-export interface NoticeConfigData {
-  noticeContent: NoticeConfig;
-}
-
-import { Response } from "../api/common";
-export type NoticeConfigResponse = Response<NoticeConfigData>;
-
 export function useSwitchTheme() {
   const config = useAppConfig();
-  const useWebsiteConfig = useWebsiteConfigStore();
 
   useEffect(() => {
     document.body.classList.remove("light");
@@ -128,10 +82,6 @@ export function useSwitchTheme() {
       metaDescriptionLight?.setAttribute("content", themeColor);
     }
   }, [config.theme]);
-
-  useEffect(() => {
-    document.title = useWebsiteConfig.title || "AI Chat";
-  }, [useWebsiteConfig.title]);
 }
 
 const useHasHydrated = () => {
@@ -168,50 +118,6 @@ function Screen() {
     loadAsyncGoogleFont();
   }, []);
 
-  const { fetchWebsiteConfig } = useWebsiteConfigStore();
-  useEffect(() => {
-    fetchWebsiteConfig();
-  }, [fetchWebsiteConfig]);
-
-  const { botHello } = useWebsiteConfigStore();
-  useEffect(() => {
-    if (botHello) {
-      // todo i18n
-      BOT_HELLO.content = botHello;
-    }
-  }, [botHello]);
-
-  const [noticeShow, setNoticeShow] = useState(false);
-  const [noticeTitle, setNoticeTitle] = useState("");
-  const [noticeContent, setNoticeContent] = useState("");
-  useEffect(() => {
-    const url = "/globalConfig/notice";
-    const BASE_URL = process.env.BASE_URL;
-    const mode = process.env.BUILD_MODE;
-    let requestUrl = mode === "export" ? BASE_URL + url : "/api" + url;
-    fetch(requestUrl, {
-      method: "get",
-    })
-      .then((res) => res.json())
-      .then((res: NoticeConfigResponse) => {
-        console.log("[GlobalConfig] got notice config from server", res);
-        const notice = res.data.noticeContent;
-        if (notice.show) {
-          setNoticeTitle(notice.title);
-          setNoticeContent(notice.content);
-          if (notice.splash) {
-            setNoticeShow(true);
-          }
-        }
-      })
-      .catch(() => {
-        console.error("[GlobalConfig] failed to fetch config");
-      })
-      .finally(() => {
-        // fetchState = 2;
-      });
-  }, []);
-
   return (
     <div
       className={
@@ -229,13 +135,7 @@ function Screen() {
         </>
       ) : (
         <>
-          <SideBar
-            className={isHome ? styles["sidebar-show"] : ""}
-            noticeShow={noticeShow}
-            noticeTitle={noticeTitle}
-            noticeContent={noticeContent}
-            setNoticeShow={setNoticeShow}
-          />
+          <SideBar className={isHome ? styles["sidebar-show"] : ""} />
 
           <div className={styles["window-content"]} id={SlotID.AppBody}>
             <Routes>
@@ -244,11 +144,6 @@ function Screen() {
               <Route path={Path.Masks} element={<MaskPage />} />
               <Route path={Path.Chat} element={<Chat />} />
               <Route path={Path.Settings} element={<Settings />} />
-              <Route path={Path.Login} element={<Login />} />
-              <Route path={Path.Register} element={<Register />} />
-              <Route path={Path.ForgetPassword} element={<ForgetPassword />} />
-              <Route path={Path.Profile} element={<Profile />} />
-              <Route path={Path.Pricing} element={<Pricing />} />
             </Routes>
           </div>
         </>

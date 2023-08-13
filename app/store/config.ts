@@ -18,7 +18,7 @@ export enum Theme {
 }
 
 export const DEFAULT_CONFIG = {
-  submitKey: SubmitKey.Enter as SubmitKey,
+  submitKey: SubmitKey.CtrlEnter as SubmitKey,
   avatar: "1f603",
   fontSize: 14,
   theme: Theme.Auto as Theme,
@@ -121,7 +121,7 @@ export const ALL_MODELS = [
   },
 ] as const;
 
-export type ModelType = (typeof ALL_MODELS)[number]["name"] | string;
+export type ModelType = (typeof ALL_MODELS)[number]["name"];
 
 export function limitNumber(
   x: number,
@@ -144,7 +144,7 @@ export function limitModel(name: string) {
 
 export const ModalConfigValidator = {
   model(x: string) {
-    return x as ModelType;
+    return limitModel(x) as ModelType;
   },
   max_tokens(x: number) {
     return limitNumber(x, 0, 32000, 2000);

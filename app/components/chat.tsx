@@ -10,8 +10,6 @@ import React, {
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
-import UserIcon from "../icons/user.svg";
-import CartIcon from "../icons/cart-outline.svg";
 import ExportIcon from "../icons/share.svg";
 import ReturnIcon from "../icons/return.svg";
 import CopyIcon from "../icons/copy.svg";
@@ -40,12 +38,11 @@ import {
   useChatStore,
   BOT_HELLO,
   createMessage,
-  useAuthStore,
   useAccessStore,
   Theme,
   useAppConfig,
   DEFAULT_TOPIC,
-  ModelType,
+  ALL_MODELS,
 } from "../store";
 
 import {
@@ -75,7 +72,6 @@ import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
 import { prettyObject } from "../utils/format";
 import { ExportMessageModal } from "./exporter";
 import { getClientConfig } from "../config/client";
-import { useWebsiteConfigStore } from "../store";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
@@ -373,7 +369,6 @@ export function ChatActions(props: {
   const config = useAppConfig();
   const navigate = useNavigate();
   const chatStore = useChatStore();
-  const { availableModelNames } = useWebsiteConfigStore();
 
   // switch themes
   const theme = config.theme;
@@ -392,12 +387,12 @@ export function ChatActions(props: {
   // switch model
   const currentModel = chatStore.currentSession().mask.modelConfig.model;
   function nextModel() {
-    const models = availableModelNames;
+    const models = ALL_MODELS.filter((m) => m.available).map((m) => m.name);
     const modelIndex = models.indexOf(currentModel);
     const nextIndex = (modelIndex + 1) % models.length;
     const nextModel = models[nextIndex];
     chatStore.updateCurrentSession((session) => {
-      session.mask.modelConfig.model = nextModel as ModelType;
+      session.mask.modelConfig.model = nextModel;
       session.mask.syncGlobalConfig = false;
     });
   }
@@ -500,11 +495,7 @@ export function Chat() {
   const { scrollRef, setAutoScroll, scrollToBottom } = useScrollToBottom();
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
-  const websiteConfigStore = useWebsiteConfigStore();
-  const { chatPageSubTitle } = websiteConfigStore;
   const navigate = useNavigate();
-
-  const authStore = useAuthStore();
 
   const onChatBodyScroll = (e: HTMLElement) => {
     const isTouchBottom = e.scrollTop + e.clientHeight >= e.scrollHeight - 10;
@@ -587,11 +578,7 @@ export function Chat() {
       return;
     }
     setIsLoading(true);
-    chatStore
-      .onUserInput(userInput, websiteConfigStore, authStore, () =>
-        navigate(Path.Login),
-      )
-      .then(() => setIsLoading(false));
+    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
@@ -714,11 +701,7 @@ export function Chat() {
     setIsLoading(true);
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
-    chatStore
-      .onUserInput(content, websiteConfigStore, authStore, () =>
-        navigate(Path.Login),
-      )
-      .then(() => setIsLoading(false));
+    chatStore.onUserInput(content).then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 
@@ -744,14 +727,14 @@ export function Chat() {
     ? []
     : session.mask.context.slice();
 
-  // const accessStore = useAccessStore();
+  const accessStore = useAccessStore();
 
   if (
     context.length === 0 &&
     session.messages.at(0)?.content !== BOT_HELLO.content
   ) {
     const copiedHello = Object.assign({}, BOT_HELLO);
-    if (!authStore.token) {
+    if (!accessStore.isAuthorized()) {
       copiedHello.content = Locale.Error.Unauthorized;
     }
     context.push(copiedHello);
@@ -820,26 +803,6 @@ export function Chat() {
     },
   });
 
-  useEffect(() => {
-    if (!authStore.token) {
-      //navigate(Path.Login)
-      return;
-    }
-  }, []);
-
-  //console.log('messages', messages)
-  const message = messages.length > 0 ? messages.at(messages.length - 1) : null;
-  if (message) {
-    //console.log('message', message.content)
-    if (message.content === Locale.Error.Unauthorized) {
-      if (authStore.token) {
-        console.log("change the last message");
-        message.content = Locale.Error.Login;
-      }
-    }
-    //console.log('messages', messages)
-  }
-
   return (
     <div className={styles.chat} key={session.id}>
       <div className="window-header" data-tauri-drag-region>
@@ -864,12 +827,7 @@ export function Chat() {
             {!session.topic ? DEFAULT_TOPIC : session.topic}
           </div>
           <div className="window-header-sub-title">
-            {chatPageSubTitle
-              ? chatPageSubTitle.replace(
-                  "${count}",
-                  "" + session.messages.length,
-                )
-              : Locale.Chat.SubTitle(session.messages.length)}
+            {Locale.Chat.SubTitle(session.messages.length)}
           </div>
         </div>
         <div className="window-actions">
@@ -882,20 +840,6 @@ export function Chat() {
               />
             </div>
           )}
-          <div className="window-action-button">
-            <IconButton
-              icon={<CartIcon />}
-              bordered
-              onClick={() => navigate(Path.Pricing)}
-            />
-          </div>
-          <div className="window-action-button">
-            <IconButton
-              icon={<UserIcon />}
-              bordered
-              onClick={() => navigate(Path.Profile)}
-            />
-          </div>
           <div className="window-action-button">
             <IconButton
               icon={<ExportIcon />}

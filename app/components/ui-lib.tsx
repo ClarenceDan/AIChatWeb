@@ -39,7 +39,7 @@ export function Card(props: { children: JSX.Element[]; className?: string }) {
 }
 
 export function ListItem(props: {
-  title?: string;
+  title: string;
   subTitle?: string;
   children?: JSX.Element | JSX.Element[];
   icon?: JSX.Element;
@@ -50,37 +50,11 @@ export function ListItem(props: {
       <div className={styles["list-header"]}>
         {props.icon && <div className={styles["list-icon"]}>{props.icon}</div>}
         <div className={styles["list-item-title"]}>
-          <div>{props.title || ""}</div>
+          <div>{props.title}</div>
           {props.subTitle && (
             <div className={styles["list-item-sub-title"]}>
               {props.subTitle}
             </div>
-          )}
-        </div>
-      </div>
-      {props.children}
-    </div>
-  );
-}
-
-export function DangerousListItem(props: {
-  title?: string;
-  subTitle?: string;
-  children?: JSX.Element | JSX.Element[];
-  icon?: JSX.Element;
-  className?: string;
-}) {
-  return (
-    <div className={styles["list-item"] + ` ${props.className}`}>
-      <div className={styles["list-header"]}>
-        {props.icon && <div className={styles["list-icon"]}>{props.icon}</div>}
-        <div className={styles["list-item-title"]}>
-          <div dangerouslySetInnerHTML={{ __html: props.title || "" }}></div>
-          {props.subTitle && (
-            <div
-              className={styles["list-item-sub-title"]}
-              dangerouslySetInnerHTML={{ __html: props.subTitle }}
-            ></div>
           )}
         </div>
       </div>
@@ -237,16 +211,6 @@ export function showToast(
   }, delay);
 
   root.render(<Toast content={content} action={action} onClose={close} />);
-}
-
-export function SingleInput(props: React.HTMLProps<HTMLInputElement>) {
-  return (
-    <input
-      {...props}
-      type="text"
-      className={`${styles["input"]} ${styles["input-left"]} ${props.className}`}
-    />
-  );
 }
 
 export type InputProps = React.HTMLProps<HTMLTextAreaElement> & {

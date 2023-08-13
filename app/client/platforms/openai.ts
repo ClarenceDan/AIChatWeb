@@ -15,14 +15,14 @@ import { prettyObject } from "@/app/utils/format";
 
 export class ChatGPTApi implements LLMApi {
   path(path: string): string {
-    const BASE_URL = process.env.BASE_URL;
-    const mode = process.env.BUILD_MODE;
-    let baseUrl = mode === "export" ? BASE_URL ?? DEFAULT_API_HOST : "/api";
-
-    if (baseUrl.endsWith("/")) {
-      baseUrl = baseUrl.slice(0, baseUrl.length - 1);
+    let openaiUrl = useAccessStore.getState().openaiUrl;
+    if (openaiUrl.length === 0) {
+      openaiUrl = DEFAULT_API_HOST;
     }
-    return [baseUrl, path].join("/");
+    if (openaiUrl.endsWith("/")) {
+      openaiUrl = openaiUrl.slice(0, openaiUrl.length - 1);
+    }
+    return [openaiUrl, path].join("/");
   }
 
   extractMessage(res: any) {
@@ -55,13 +55,11 @@ export class ChatGPTApi implements LLMApi {
     console.log("[Request] openai payload: ", requestPayload);
 
     const shouldStream = !!options.config.stream;
-    console.log("shouldStream", shouldStream);
     const controller = new AbortController();
     options.onController?.(controller);
 
     try {
       const chatPath = this.path(OpenaiPath.ChatPath);
-      console.log("chatPath", chatPath);
       const chatPayload = {
         method: "POST",
         body: JSON.stringify(requestPayload),
@@ -112,13 +110,10 @@ export class ChatGPTApi implements LLMApi {
             ) {
               const responseTexts = [responseText];
               let extraInfo = await res.clone().text();
-              // console.log('extraInfo', extraInfo)
-              // try {
-              //   const resJson = await res.clone().json();
-              //   console.log('resJson', resJson)
-              //   extraInfo = prettyObject(resJson);
-              //   console.log('extraInfo', extraInfo)
-              // } catch {}
+              try {
+                const resJson = await res.clone().json();
+                extraInfo = prettyObject(resJson);
+              } catch {}
 
               if (res.status === 401) {
                 responseTexts.push(Locale.Error.Unauthorized);
