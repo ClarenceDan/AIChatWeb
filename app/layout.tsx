@@ -3,10 +3,11 @@ import "./styles/globals.scss";
 import "./styles/markdown.scss";
 import "./styles/highlight.scss";
 import { getClientConfig } from "./config/client";
+import { type Metadata } from "next";
 
-export const metadata = {
-  title: "AI Chat Web",
-  description: "Your personal ChatGPT Chat Bot.",
+export const metadata: Metadata = {
+  title: "Aivesa Chat",
+  description: "Chat with your AI assistant.",
   viewport: {
     width: "device-width",
     initialScale: 1,
@@ -17,7 +18,7 @@ export const metadata = {
     { media: "(prefers-color-scheme: dark)", color: "#151515" },
   ],
   appleWebApp: {
-    title: "AI Chat Web",
+    title: "Aivesa",
     statusBarStyle: "default",
   },
 };
@@ -35,6 +36,7 @@ export default function RootLayout({
         <script src="/serviceWorkerRegister.js" defer></script>
       </head>
       <body>{children}</body>
+<script async src="https://umami.appbox.fun/script.js" data-website-id="1a4fa386-6091-43b3-8704-ffd6bae52747"></script>
     </html>
   );
 }

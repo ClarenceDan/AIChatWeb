@@ -10,10 +10,11 @@
   --gray: rgb(250, 250, 250);
   --primary: rgb(29, 147, 171);
   --second: rgb(231, 248, 255);
-  --danger: rgb(226 55 55);
+--danger: rgb(226 55 55);
   --hover-color: #f3f3f3;
   --bar-color: rgba(0, 0, 0, 0.1);
   --theme-color: var(--gray);
+--disabled: #ccc;
 
   /* shadow */
   --shadow: 50px 50px 100px 10px rgb(0, 0, 0, 0.1);
@@ -31,7 +32,7 @@
   --black: rgb(187, 187, 187);
   --gray: rgb(21, 21, 21);
   --primary: rgb(29, 147, 171);
-  --danger: rgb(167, 45, 41);
+--danger: rgb(167, 45, 41);
   --second: rgb(27 38 42);
   --hover-color: #323232;
 
@@ -40,6 +41,7 @@
   --border-in-light: 1px solid rgba(255, 255, 255, 0.192);
 
   --theme-color: var(--gray);
+--disabled: #666;
 
   div:not(.no-dark) > svg {
     filter: invert(0.5);
@@ -91,8 +93,7 @@
 html {
   height: var(--full-height);
 
-  font-family: "Noto Sans SC", "SF Pro SC", "SF Pro Text", "SF Pro Icons",
-    "PingFang SC", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  font-family: "Microsoft Yahei", "PingFang SC", "SF Pro SC", "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
 
 body {
@@ -107,6 +108,7 @@ body {
   align-items: center;
   user-select: none;
   touch-action: pan-x pan-y;
+  overflow: hidden;
 
   @media only screen and (max-width: 600px) {
     background-color: var(--second);
@@ -233,8 +235,6 @@ input[type="password"] {
   padding: 0 10px;
   max-width: 50%;
   font-family: inherit;
-  box-sizing: border-box;
-  min-width: 180px;
 }
 
 div.math {
@@ -335,12 +335,10 @@ pre {
 
   .password-eye {
     margin-right: 4px;
-    height: 40px;
   }
 
   .password-input {
-    min-width: 180px;
-    text-align: left;
+    min-width: 80%;
   }
 }
 
@@ -354,7 +352,7 @@ pre {
   justify-content: center;
   border: var(--border-in-light);
   box-shadow: var(--card-shadow);
-  border-radius: 10px;
+  border-radius: 11px;
 }
 
 .one-line {

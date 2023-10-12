@@ -1,5 +1,5 @@
 import DeleteIcon from "../icons/delete.svg";
-// import BotIcon from "../icons/bot.svg";
+import BotIcon from "../icons/bot.svg";
 
 import styles from "./home.module.scss";
 import {
@@ -26,7 +26,7 @@ export function ChatItem(props: {
   count: number;
   time: string;
   selected: boolean;
-  id: number;
+  id: string;
   index: number;
   narrow?: boolean;
   mask: Mask;

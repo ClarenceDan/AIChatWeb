@@ -1,7 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { StoreKey } from "../constant";
-import { requestLogin } from "../requests";
+import {
+  requestLogin,
+  requestSendPhoneCode,
+  requestWechatLogin,
+} from "../requests";
 import {
   requestRegister,
   requestSendEmailCode,
@@ -12,9 +16,12 @@ export interface AuthStore {
   token: string;
   username: string;
   email: string;
+  phone: string;
+  inviteCode: string;
   login: (username: string, password: string) => Promise<any>;
   logout: () => void;
   sendEmailCode: (email: string) => Promise<any>;
+  sendPhoneCode: (phone: string) => Promise<any>;
   sendEmailCodeForResetPassword: (email: string) => Promise<any>;
   register: (
     name: string,
@@ -23,14 +30,18 @@ export interface AuthStore {
     captchaId: string,
     captchaInput: string,
     email: string,
+    phone: string,
     code: string,
+    inviteCode: string,
   ) => Promise<any>;
   resetPassword: (
     password: string,
     email: string,
     code: string,
   ) => Promise<any>;
+  wechatLogin: (code: string, state: string, appType: string) => Promise<any>;
   removeToken: () => void;
+  updateInviteCode: (code: string) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -39,14 +50,16 @@ export const useAuthStore = create<AuthStore>()(
       name: "",
       username: "",
       email: "",
+      phone: "",
       token: "",
+      inviteCode: "",
 
       async login(username, password) {
         // set(() => ({
         //   username,
         // }));
 
-        let result = await requestLogin(username, password, {
+        let result: any = await requestLogin(username, password, {
           onError: (err) => {
             console.error(err);
           },
@@ -54,9 +67,11 @@ export const useAuthStore = create<AuthStore>()(
         console.log("result", result);
         if (result && result.code == 0) {
           set(() => ({
-            username,
+            username: result.data?.userEntity?.username || username,
             email: result.data?.userEntity?.email || "",
+            phone: result.data?.userEntity?.phone || "",
             token: result.data?.token || "",
+            inviteCode: result.data?.userEntity?.inviteCode || "",
           }));
         }
 
@@ -66,11 +81,18 @@ export const useAuthStore = create<AuthStore>()(
         set(() => ({
           username: "",
           email: "",
+          phone: "",
           token: "",
+          inviteCode: "",
         }));
       },
       removeToken() {
         set(() => ({ token: "" }));
+      },
+      updateInviteCode(code: string) {
+        set(() => ({
+          inviteCode: code,
+        }));
       },
       async sendEmailCodeForResetPassword(email) {
         let result = await requestSendEmailCode(email, true, {
@@ -88,6 +110,14 @@ export const useAuthStore = create<AuthStore>()(
         });
         return result;
       },
+      async sendPhoneCode(phone: string) {
+        let result = await requestSendPhoneCode(phone, false, {
+          onError: (err) => {
+            console.error(err);
+          },
+        });
+        return result;
+      },
       async register(
         name,
         username,
@@ -95,7 +125,9 @@ export const useAuthStore = create<AuthStore>()(
         captchaId,
         captchaInput,
         email,
+        phone,
         code,
+        inviteCode,
       ) {
         let result = await requestRegister(
           name,
@@ -104,7 +136,9 @@ export const useAuthStore = create<AuthStore>()(
           captchaId,
           captchaInput,
           email,
+          phone,
           code,
+          inviteCode,
           {
             onError: (err) => {
               console.error(err);
@@ -115,9 +149,11 @@ export const useAuthStore = create<AuthStore>()(
         if (result && result.code == 0) {
           set(() => ({
             name,
-            username,
+            username: result.data?.userEntity?.username || username,
             email: result.data?.userEntity?.email || "",
+            phone: result.data?.userEntity?.phone || "",
             token: result.data?.token || "",
+            inviteCode: result.data?.userEntity?.inviteCode || "",
           }));
         }
 
@@ -137,7 +173,29 @@ export const useAuthStore = create<AuthStore>()(
             name: user.name || "",
             username: user.username || "",
             email: user.email || "",
+            phone: user.phone || "",
             token: data.token || "",
+            inviteCode: user.inviteCode || "",
+          }));
+        }
+        return result;
+      },
+      async wechatLogin(code, state, appType) {
+        let result = await requestWechatLogin(code, state, appType, {
+          onError: (err) => {
+            console.error(err);
+          },
+        });
+        if (result && result.code == 0 && result.data) {
+          const data = result.data;
+          const user = data.userEntity;
+          set(() => ({
+            name: user.name || "",
+            username: user.username || "",
+            email: user.email || "",
+            phone: user.phone || "",
+            token: data.token || "",
+            inviteCode: user.inviteCode || "",
           }));
         }
         return result;

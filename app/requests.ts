@@ -34,13 +34,13 @@ export async function request(
     const mode = process.env.BUILD_MODE;
     // console.log('BASE_URL', BASE_URL)
     // console.log('mode', mode)
-    let requestUrl = mode === "export" ? BASE_URL + url : "/api" + url;
+    let requestUrl = (mode === "export" ? BASE_URL : "") + "/api" + url;
     const res = await fetch(requestUrl, {
       method: method,
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: body === null ? null : JSON.stringify(body),
       // // @ts-ignore
       // duplex: "half",
     });
@@ -114,7 +114,9 @@ export async function requestRegister(
   captchaId: string,
   captchaInput: string,
   email: string,
+  phone: string,
   code: string,
+  inviteCode: string,
   options?: {
     onError: (error: Error, statusCode?: number) => void;
   },
@@ -122,7 +124,17 @@ export async function requestRegister(
   return request(
     "/register",
     "POST",
-    { name, username, password, captchaId, captcha: captchaInput, email, code },
+    {
+      name,
+      username,
+      password,
+      captchaId,
+      captcha: captchaInput,
+      email,
+      phone,
+      code,
+      inviteCode,
+    },
     options,
   );
 }
@@ -141,6 +153,39 @@ export async function requestSendEmailCode(
       email,
       type: resetPassword ? "resetPassword" : "register",
     },
+    options,
+  );
+}
+export async function requestSendPhoneCode(
+  phone: string,
+  resetPassword: boolean,
+  options?: {
+    onError: (error: Error, statusCode?: number) => void;
+  },
+): Promise<RegisterResult> {
+  return request(
+    "/sendRegisterPhoneCode",
+    "POST",
+    {
+      phone,
+      type: resetPassword ? "resetPassword" : "register",
+    },
+    options,
+  );
+}
+
+export function requestWechatLogin(
+  code: string,
+  state: string,
+  appType: string,
+  options?: {
+    onError: (error: Error, statusCode?: number) => void;
+  },
+): Promise<RegisterResult> {
+  return request(
+    `/wechat/loginCallback?code=${code}&state=${state}&appType=${appType}`,
+    "GET",
+    null,
     options,
   );
 }

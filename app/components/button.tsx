@@ -2,14 +2,13 @@ import * as React from "react";
 
 import styles from "./button.module.scss";
 
-export type ButtonType = "primary" | "second" | "danger" | null;
+export type ButtonType = "primary" | "danger" | null;
 
 export function IconButton(props: {
   onClick?: () => void;
   icon?: JSX.Element;
   type?: ButtonType;
   text?: string;
-  block?: boolean;
   bordered?: boolean;
   shadow?: boolean;
   className?: string;
@@ -23,8 +22,8 @@ export function IconButton(props: {
       className={
         styles["icon-button"] +
         ` ${props.bordered && styles.border} ${props.shadow && styles.shadow} ${
-          props.block && styles.block
-        } ${props.className ?? ""} clickable ${styles[props.type ?? ""]}`
+          props.className ?? ""
+        } clickable ${styles[props.type ?? ""]}`
       }
       onClick={props.onClick}
       title={props.title}
@@ -50,13 +49,3 @@ export function IconButton(props: {
     </button>
   );
 }
-
-// export function Button(props: {
-//   onClick?: () => void;
-// }) {
-//   return (
-//     <button>
-
-//     </button>
-//   )
-// }

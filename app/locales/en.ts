@@ -1,29 +1,37 @@
+import { getClientConfig } from "../config/client";
 import { SubmitKey } from "../store/config";
 import { LocaleType } from "./index";
 
+// if you are adding a new translation, please use PartialLocaleType instead of LocaleType
+
+const isApp = !!getClientConfig()?.isApp;
 const en: LocaleType = {
   WIP: "Coming Soon...",
   Error: {
-    Unauthorized:
-      "Unauthorized access, please enter access code in settings page.",
-    Login: "您已登录，请点击下方「重试」按钮",
+    Unauthorized: isApp
+      ? "Invalid API Key, please check it in [Settings](/#/settings) page."
+      : "Unauthorized access, please enter access code in [auth](/#/auth) page, or enter your OpenAI API Key.",
   },
   Auth: {
     Title: "Need Access Code",
     Tips: "Please enter access code below",
+    SubTips: "Or enter your OpenAI API Key",
     Input: "access code",
     Confirm: "Confirm",
     Later: "Later",
-  },
-  Sidebar: {
-    Title: "公告",
-    Close: "关闭",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} messages`,
   },
   Chat: {
     SubTitle: (count: number) => `${count} messages`,
+    EditMessage: {
+      Title: "Edit All Messages",
+      Topic: {
+        Title: "Topic",
+        SubTitle: "Change the current topic",
+      },
+    },
     Actions: {
       ChatList: "Go To Chat List",
       CompressedHistory: "Compressed History Memory Prompt",
@@ -32,7 +40,7 @@ const en: LocaleType = {
       Stop: "Stop",
       Retry: "Retry",
       Pin: "Pin",
-      PinToastContent: "Pinned 2 messages to contextual prompts",
+      PinToastContent: "Pinned 1 messages to contextual prompts",
       PinToastAction: "View",
       Delete: "Delete",
       Edit: "Edit",
@@ -57,73 +65,29 @@ const en: LocaleType = {
       Masks: "Masks",
       Clear: "Clear Context",
       Settings: "Settings",
-      Internet: "Access Internet",
     },
     Rename: "Rename Chat",
     Typing: "Typing…",
-    SensitiveWordsTip: (question: string) =>
-      `您的提问中包含敏感词：${question}`,
-    BalanceNotEnough: "您的额度不足，请联系管理员",
-    Input: (submitKey: string, action: string, append?: boolean) => {
-      var inputHints = `${submitKey} to ${action}`;
+    Input: (submitKey: string) => {
+      var inputHints = `${submitKey} to send`;
       if (submitKey === String(SubmitKey.Enter)) {
         inputHints += ", Shift + Enter to wrap";
       }
-      return (
-        inputHints + (append ? ", / to search prompts, : to use commands" : "")
-      );
+      return inputHints + ", / to search prompts, : to use commands";
     },
     Send: "Send",
-    Draw: "Draw",
     Config: {
       Reset: "Reset to Default",
       SaveAs: "Save as Mask",
     },
-  },
-  Midjourney: {
-    SelectImgMax: (max: number) => `Select up to ${max} images`,
-    InputDisabled: "Input is disabled in this mode",
-    HasImgTip:
-      "Tip: In the mask mode, only the first image will be used. In the blend mode, the five selected images will be used in order (click the image to remove it)",
-    ModeImagineUseImg: "Mask Mode",
-    ModeBlend: "Blend Mode",
-    ModeDescribe: "Describe Mode",
-    NeedInputUseImgPrompt:
-      'You need to enter content to use the image in the mask mode, please enter the content starting with "/mj"',
-    BlendMinImg: (min: number, max: number) =>
-      `At least ${min} images are required in the mixed image mode, and up to ${max} images are required`,
-    TaskErrUnknownType: "Task submission failed: unknown task type",
-    TaskErrNotSupportType: (type: string) =>
-      `Task submission failed: unsupported task type -> ${type}`,
-    StatusCode: (code: number) => `Status code: ${code}`,
-    TaskSubmitErr: (err: string) => `Task submission failed: ${err}`,
-    RespBody: (body: string) => `Response body: ${body}`,
-    None: "None",
-    UnknownError: "Unknown error",
-    UnknownReason: "Unknown reason",
-    TaskPrefix: (prompt: string, taskId: string) =>
-      `**Prompt:** ${prompt}\n**Task ID:** ${taskId}\n`,
-    PleaseWait: "Please wait a moment",
-    TaskSubmitOk: "Task submitted successfully",
-    TaskStatusFetchFail: "Failed to get task status",
-    TaskStatus: "Task status",
-    TaskRemoteSubmit: "Task has been submitted to Midjourney server",
-    TaskProgressTip: (progress: number | undefined) =>
-      `Task is running${progress ? `, current progress: ${progress}` : ""}`,
-    TaskNotStart: "Task has not started",
-    Url: "URL",
-    SettingProxyCoverTip:
-      "The MidjourneyProxy address defined here will override the MIDJOURNEY_PROXY_URL in the environment variables",
-    ImageAgent: "Image Agent",
-    ImageAgentOpenTip:
-      "After turning it on, the returned Midjourney image will be proxied by this program itself, so this program needs to be in a network environment that can access cdn.discordapp.com to be effective",
+    IsContext: "Contextual Prompt",
   },
   Export: {
     Title: "Export Messages",
     Copy: "Copy All",
     Download: "Download",
     MessageFromYou: "Message From You",
-    MessageFromChatGPT: "Message From ChatGPT",
+    MessageFromAivesa: "Message From Aivesa",
     Share: "Share to ShareGPT",
     Format: {
       Title: "Export Format",
@@ -136,6 +100,10 @@ const en: LocaleType = {
     Steps: {
       Select: "Select",
       Preview: "Preview",
+    },
+    Image: {
+      Toast: "Capturing Image...",
+      Modal: "Long press or right click to save image",
     },
   },
   Select: {
@@ -158,164 +126,6 @@ const en: LocaleType = {
     DeleteChat: "Confirm to delete the selected conversation?",
     DeleteToast: "Chat Deleted",
     Revert: "Revert",
-    NoNotice: "暂无公告",
-  },
-  LoginPage: {
-    Title: "登录",
-    SubTitle: "登录后可跟AI交流",
-    Username: {
-      Title: "用户名或邮箱",
-      SubTitle: "",
-      Placeholder: "请输入用户名或邮箱",
-    },
-    Password: {
-      Title: "密码",
-      SubTitle: "",
-      Placeholder: "请输入密码",
-    },
-    Actions: {
-      Close: "关闭",
-      Login: "登录",
-      Logout: "退出登录",
-    },
-    Toast: {
-      Success: "登录成功",
-      Logining: "登录中……",
-      EmptyUserName: "用户名或邮箱不能为空",
-      EmptyPassword: "密码不能为空！",
-    },
-    GoToRegister: "前往注册",
-    ForgetPassword: "忘记/重置密码",
-  },
-  RegisterPage: {
-    Title: "注册",
-    SubTitle: "注册后赠送免费额度哦",
-    Name: {
-      Title: "昵称",
-      SubTitle: "",
-      Placeholder: "请输入昵称，可不填",
-    },
-    Email: {
-      Title: "邮箱",
-      SubTitle: "",
-      Placeholder: "请输入邮箱",
-    },
-    EmailCode: {
-      Title: "验证码",
-      SubTitle: "系统将向您邮箱发送的验证码",
-      Placeholder: "请输入验证码",
-    },
-    Username: {
-      Title: "用户名",
-      SubTitle: "",
-      Placeholder: "请输入用户名",
-    },
-    Password: {
-      Title: "密码",
-      SubTitle: "",
-      Placeholder: "请输入密码",
-    },
-    ConfirmedPassword: {
-      Title: "确认密码",
-      SubTitle: "",
-      Placeholder: "请再次输入密码",
-    },
-    Actions: {
-      Close: "关闭",
-    },
-    Toast: {
-      Success: "注册成功，正在前往聊天……",
-      Registering: "注册中……",
-      Failed: "注册失败！",
-      FailedWithReason: "注册失败！原因：",
-      PasswordNotTheSame: "两次输入的密码不一致！",
-      PasswordEmpty: "密码不能为空！",
-      SendEmailCode: "发送验证码",
-      EmailCodeSending: "验证码发送中",
-      EmailCodeSent: "验证码已发送，请查看邮箱",
-      EmailIsEmpty: "请输入邮箱",
-      EmailCodeSentFrequently: "验证码发送过于频繁，请稍后再试",
-      EmailFormatError: "邮箱格式不正确",
-      EmailCodeEmpty: "请输入邮箱验证码",
-      EmailExistsError: "该邮箱已注册",
-    },
-    GoToLogin: "前往登录",
-    Captcha: "",
-    CaptchaTitle: "点击刷新验证码",
-    CaptchaIsEmpty: "请输入图形验证码",
-    CaptchaLengthError: "图形验证码长度不正确",
-    CaptchaInput: {
-      Title: "图形验证码",
-      SubTitle: "",
-      Placeholder: "请输入图中的验证码",
-    },
-  },
-  ForgetPasswordPage: {
-    Title: "重置密码",
-    SubTitle: "",
-    Toast: {
-      PasswordResetting: "重置密码中",
-      PasswordResetFailed: "重置密码失败！",
-      PasswordResetSuccess: "重置成功，正在前往聊天……",
-      PasswordResetFailedWithReason: "重置失败！原因：",
-    },
-    Actions: {
-      Close: "关闭",
-    },
-  },
-  Profile: {
-    Title: "个人中心",
-    SubTitle: "个人中心",
-    Username: "账号",
-    Email: "邮箱",
-    Tokens: {
-      Title: "tokens",
-      SubTitle: "剩余tokens数量",
-    },
-    ChatCount: {
-      Title: "询问次数",
-      SubTitle: "剩余询问次数（GPT3.5等）",
-    },
-    AdvanceChatCount: {
-      Title: "询问次数（GPT4）",
-      SubTitle: "聊天询问次数（GPT4）",
-    },
-    DrawCount: {
-      Title: "绘图次数",
-      SubTitle: "剩余绘图次数",
-    },
-    Actions: {
-      Close: "关闭",
-      Pricing: "购买套餐",
-      GoToBalanceList: "更多",
-      ConsultAdministrator: "请咨询站长",
-    },
-    BalanceItem: {
-      Title: "套餐类型",
-      SubTitle: "",
-      CalcTypes: {
-        Total: "总额",
-        Daily: "每天",
-        Hourly: "每小时",
-        ThreeHourly: "每3小时",
-      },
-    },
-    ExpireList: {
-      Title: "过期时间",
-      SubTitle: "",
-    },
-  },
-  PricingPage: {
-    Title: "充值",
-    SubTitle: "畅享与AI聊天的乐趣",
-    Actions: {
-      Close: "关闭",
-      Buy: " 购 买 ",
-    },
-    NoPackage: "暂无可用套餐",
-    Loading: "套餐加载中……",
-    PleaseLogin: "请先登录",
-    ConsultAdministrator: "请咨询站长",
   },
   Settings: {
     Title: "Settings",
@@ -343,7 +153,10 @@ const en: LocaleType = {
       Title: "Font Size",
       SubTitle: "Adjust font size of chat content",
     },
-
+    InjectSystemPrompts: {
+      Title: "Inject System Prompts",
+      SubTitle: "Inject a global system prompt for every request",
+    },
     InputTemplate: {
       Title: "Input Template",
       SubTitle: "Newest message will be filled to this template",
@@ -364,9 +177,63 @@ const en: LocaleType = {
       Title: "Send Preview Bubble",
       SubTitle: "Preview markdown in bubble",
     },
+    AutoGenerateTitle: {
+      Title: "Auto Generate Title",
+      SubTitle: "Generate a suitable title based on the conversation content",
+    },
+    Sync: {
+      CloudState: "Last Update",
+      NotSyncYet: "Not sync yet",
+      Success: "Sync Success",
+      Fail: "Sync Fail",
+
+      Config: {
+        Modal: {
+          Title: "Config Sync",
+          Check: "Check Connection",
+        },
+        SyncType: {
+          Title: "Sync Type",
+          SubTitle: "Choose your favorite sync service",
+        },
+        Proxy: {
+          Title: "Enable CORS Proxy",
+          SubTitle: "Enable a proxy to avoid cross-origin restrictions",
+        },
+        ProxyUrl: {
+          Title: "Proxy Endpoint",
+          SubTitle:
+            "Only applicable to the built-in CORS proxy for this project",
+        },
+
+        WebDav: {
+          Endpoint: "WebDAV Endpoint",
+          UserName: "User Name",
+          Password: "Password",
+        },
+
+        UpStash: {
+          Endpoint: "UpStash Redis REST Url",
+          UserName: "Backup Name",
+          Password: "UpStash Redis REST Token",
+        },
+      },
+
+      LocalState: "Local Data",
+      Overview: (overview: any) => {
+        return `${overview.chat} chats，${overview.message} messages，${overview.prompt} prompts，${overview.mask} masks`;
+      },
+      ImportFailed: "Failed to import from file",
+    },
     Mask: {
-      Title: "Mask Splash Screen",
-      SubTitle: "Show a mask splash screen before starting new chat",
+      Splash: {
+        Title: "Mask Splash Screen",
+        SubTitle: "Show a mask splash screen before starting new chat",
+      },
+      Builtin: {
+        Title: "Hide Builtin Masks",
+        SubTitle: "Hide builtin masks in mask list",
+      },
     },
     Prompt: {
       Disable: {
@@ -398,7 +265,7 @@ const en: LocaleType = {
     Token: {
       Title: "API Key",
       SubTitle: "Use your key to ignore access code limit",
-      Placeholder: "OpenAI API Key",
+      Placeholder: "sk-xxxxx",
     },
     Usage: {
       Title: "Account Balance",
@@ -418,10 +285,18 @@ const en: LocaleType = {
       Title: "Endpoint",
       SubTitle: "Custom endpoint must start with http(s)://",
     },
+    CustomModel: {
+      Title: "Custom Models",
+      SubTitle: "Add extra model options, separate by comma",
+    },
     Model: "Model",
     Temperature: {
       Title: "Temperature",
       SubTitle: "A larger value makes the more random output",
+    },
+    TopP: {
+      Title: "Top P",
+      SubTitle: "Do not alter this value together with temperature",
     },
     MaxTokens: {
       Title: "Max Tokens",
@@ -436,10 +311,6 @@ const en: LocaleType = {
       Title: "Frequency Penalty",
       SubTitle:
         "A larger value decreasing the likelihood to repeat the same line",
-    },
-    Version: {
-      Title: "版本",
-      SubTitle: "",
     },
   },
   Store: {
@@ -459,15 +330,22 @@ const en: LocaleType = {
     Success: "Copied to clipboard",
     Failed: "Copy failed, please grant permission to access clipboard",
   },
+  Download: {
+    Success: "Content downloaded to your directory.",
+    Failed: "Download failed.",
+  },
   Context: {
     Toast: (x: any) => `With ${x} contextual prompts`,
-    Edit: "Contextual and Memory Prompts",
+    Edit: "Current Chat Settings",
     Add: "Add a Prompt",
     Clear: "Context Cleared",
     Revert: "Revert",
   },
   Plugin: {
     Name: "Plugin",
+  },
+  FineTuned: {
+    Sysmessage: "You are an assistant that",
   },
   Mask: {
     Name: "Mask",
@@ -503,6 +381,11 @@ const en: LocaleType = {
         Title: "Hide Context Prompts",
         SubTitle: "Do not show in-context prompts in chat",
       },
+      Share: {
+        Title: "Share This Mask",
+        SubTitle: "Generate a link to this mask",
+        Action: "Copy Link",
+      },
     },
   },
   NewChat: {
@@ -521,12 +404,21 @@ const en: LocaleType = {
     Close: "Close",
     Create: "Create",
     Edit: "Edit",
+    Export: "Export",
+    Import: "Import",
+    Sync: "Sync",
+    Config: "Config",
   },
   Exporter: {
     Model: "Model",
     Messages: "Messages",
     Topic: "Topic",
     Time: "Time",
+  },
+
+  URLCommand: {
+    Code: "Detected access code from url, confirm to apply? ",
+    Settings: "Detected settings from url, confirm to apply?",
   },
 };
 
