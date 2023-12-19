@@ -9,12 +9,13 @@ import LightningIcon from "../icons/lightning.svg";
 import EyeIcon from "../icons/eye.svg";
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { Mask, useMaskStore } from "../store/mask";
+import { RemoteMask, Mask, useMaskStore } from "../store/mask";
 import Locale from "../locales";
 import { useAppConfig, useChatStore } from "../store";
 import { MaskAvatar } from "./mask";
 import { useCommand } from "../command";
 import { showConfirm } from "./ui-lib";
+import { BUILTIN_MASK_STORE } from "../masks";
 
 function getIntersectionArea(aRect: DOMRect, bRect: DOMRect) {
   const xmin = Math.max(aRect.x, bRect.x);
@@ -27,7 +28,7 @@ function getIntersectionArea(aRect: DOMRect, bRect: DOMRect) {
   return intersectionArea;
 }
 
-function MaskItem(props: { mask: Mask; onClick?: () => void }) {
+function MaskItem(props: { mask: RemoteMask; onClick?: () => void }) {
   return (
     <div className={styles["mask"]} onClick={props.onClick}>
       <MaskAvatar mask={props.mask} />
@@ -36,8 +37,8 @@ function MaskItem(props: { mask: Mask; onClick?: () => void }) {
   );
 }
 
-function useMaskGroup(masks: Mask[]) {
-  const [groups, setGroups] = useState<Mask[][]>([]);
+function useMaskGroup(masks: RemoteMask[] | Mask[]) {
+  const [groups, setGroups] = useState<RemoteMask[][] | Mask[][]>([]);
 
   useEffect(() => {
     const computeGroup = () => {
@@ -73,17 +74,58 @@ function useMaskGroup(masks: Mask[]) {
     window.addEventListener("resize", computeGroup);
     return () => window.removeEventListener("resize", computeGroup);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [masks]);
 
   return groups;
+}
+
+function useMaskTypes(masks: RemoteMask[] | Mask[]) {
+  const [maskTypes, setMaskTypes] = useState<string[]>([]);
+  useEffect(() => {
+    const newTypes = [] as string[];
+    masks.forEach((mask) => {
+      if (mask.type !== "") {
+        if (mask.type && !newTypes.includes(mask.type)) {
+          newTypes.push(mask.type);
+        }
+      }
+    });
+    newTypes.splice(0, 0, "全部");
+    // newTypes.push('其他')
+    console.log("newTypes", newTypes);
+    setMaskTypes(newTypes);
+  }, [masks]);
+  return maskTypes;
 }
 
 export function NewChat() {
   const chatStore = useChatStore();
   const maskStore = useMaskStore();
 
-  const masks = maskStore.getAll();
-  const groups = useMaskGroup(masks);
+  let [masks, setMasks] = useState<RemoteMask[] | Mask[]>([]);
+  const maskTypes = useMaskTypes(masks);
+  const [hotType, setHotType] = useState("全部");
+  const [showMasks, setShowMasks] = useState<RemoteMask[] | Mask[]>([]);
+  const groups = useMaskGroup(showMasks);
+  useEffect(() => {
+    maskStore.fetch().then((remoteMasks) => {
+      if (remoteMasks.length === 0) {
+        setMasks(maskStore.getAll());
+      } else {
+        setMasks(remoteMasks);
+      }
+    });
+  }, [maskStore]);
+  useEffect(() => {
+    setShowMasks(
+      masks.filter(
+        (m) =>
+          hotType === "全部" ||
+          m.type === hotType ||
+          (hotType === "其他" && (m.type === null || m.type === "")),
+      ),
+    );
+  }, [hotType, masks]);
 
   const navigate = useNavigate();
   const config = useAppConfig();
@@ -92,15 +134,17 @@ export function NewChat() {
 
   const { state } = useLocation();
 
-  const startChat = (mask?: Mask) => {
-    chatStore.newSession(mask);
-    setTimeout(() => navigate(Path.Chat), 1);
+  const startChat = (mask?: Mask | RemoteMask) => {
+    setTimeout(() => {
+      chatStore.newSession(mask as Mask);
+      navigate(Path.Chat);
+    }, 10);
   };
 
   useCommand({
     mask: (id) => {
       try {
-        const mask = maskStore.get(parseInt(id));
+        const mask = maskStore.get(id) ?? BUILTIN_MASK_STORE.get(id);
         startChat(mask ?? undefined);
       } catch {
         console.error("[New Chat] failed to create chat from mask id=", id);
@@ -170,6 +214,33 @@ export function NewChat() {
           className={styles["skip"]}
         />
       </div>
+
+      {maskTypes.length > 1 && (
+        <div className={styles["mask-type-container"]}>
+          <ul className={styles["mask-type-ul"]}>
+            {maskTypes.map((mt) => {
+              const active = hotType === mt;
+              return (
+                <li
+                  key={mt}
+                  className={
+                    styles["mask-type-li"] +
+                    " " +
+                    styles["clickable"] +
+                    " clickable " +
+                    (active ? styles["active"] : "")
+                  }
+                  onClick={() => {
+                    setHotType(mt);
+                  }}
+                >
+                  {mt}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
       <div className={styles["masks"]} ref={maskRef}>
         {groups.map((masks, i) => (

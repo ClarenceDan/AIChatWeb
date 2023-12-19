@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import NextImage from "next/image";
 
 import styles from "./forget-password.module.scss";
 
 import CloseIcon from "../icons/close.svg";
+import ChatBotIcon from "../icons/bot.svg";
+
 import { SingleInput, Input, List, ListItem, PasswordInput } from "./ui-lib";
 
 import { IconButton } from "./button";
-import { useAuthStore, useAccessStore, useWebsiteConfigStore } from "../store";
+import { useAuthStore, useWebsiteConfigStore } from "../store";
 
 import Locale from "../locales";
 import { Path } from "../constant";
@@ -18,8 +20,7 @@ import { showToast } from "./ui-lib";
 export function ForgetPassword() {
   const navigate = useNavigate();
   const authStore = useAuthStore();
-  // const accessStore = useAccessStore();
-  const { registerPageSubTitle } = useWebsiteConfigStore();
+  // const { mainTitle, hideChatLogWhenNotLogin } = useWebsiteConfigStore();
   // const registerType = registerTypes[0];
   // const REG_TYPE_ONLY_USERNAME = "OnlyUsername";
   // const REG_TYPE_USERNAME_WITH_CAPTCHA = "OnlyUsernameWithCaptcha";
@@ -120,7 +121,7 @@ export function ForgetPassword() {
           if (result.message) {
             showToast(
               Locale.ForgetPasswordPage.Toast.PasswordResetFailedWithReason +
-                result.message,
+              result.message,
             );
           } else {
             showToast(Locale.RegisterPage.Toast.Failed);
@@ -131,22 +132,6 @@ export function ForgetPassword() {
         setLoadingUsage(false);
       });
   }
-  // function getRegisterCaptcha(captchaId: string) {
-  //   // console.log('getRegisterCaptcha', captchaId)
-  //   fetch("/api/getRegisterCaptcha?captchaId=" + captchaId, {
-  //     method: "get",
-  //   }).then(async (resp) => {
-  //     const result = await resp.json();
-  //     if (result.code != 0) {
-  //       showToast(result.message);
-  //     } else {
-  //       setCaptcha("data:image/jpg;base64," + result.data);
-  //     }
-  //   });
-  // }
-  // useEffect(() => {
-  //   getRegisterCaptcha(captchaId);
-  // }, [captchaId]);
 
   return (
     <ErrorBoundary>
@@ -171,6 +156,17 @@ export function ForgetPassword() {
         </div>
       </div>
       <div className={styles["forget-password"]}>
+        <div style={{ textAlign: "center" }}>
+          <div className={styles["sidebar-logo"] + " no-dark"}>
+            <ChatBotIcon width={64} height={64} alt="bot" />
+          </div>
+          <div
+            style={{ lineHeight: "60px", fontWeight: 'bold' }}
+            data-tauri-drag-region
+          >
+            欢迎使用 Aivesa Pro
+          </div>
+        </div>
         <List>
           <ListItem
             title={Locale.RegisterPage.Email.Title}

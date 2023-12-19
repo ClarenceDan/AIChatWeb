@@ -8,8 +8,8 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "AIChatWeb App",
-    "version": "0.5.0"
+    "productName": "Aivesa Chat",
+    "version": "3.2.2"
   },
   "tauri": {
     "allowlist": {
@@ -44,12 +44,18 @@
         "startDragging": true,
         "unmaximize": true,
         "unminimize": true
+      },
+      "fs": {
+        "all": true
+      },
+      "notification": {
+        "all": true
       }
     },
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
-      "copyright": "2023, Nanjiren01 All Rights Reserved.",
+      "copyright": "2023, Clarence Dan All Rights Reserved.",
       "deb": {
         "depends": []
       },
@@ -61,8 +67,8 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.nanjiren01.aichat.web",
-      "longDescription": "AIChatWeb is a cross-platform AI Chat client, including Web/Win/Linux/OSX/PWA.",
+      "identifier": "com.dan.aivesa.chat",
+      "longDescription": "Aivesa is a cross-platform AI client, including Web/Win/Linux/OSX/PWA.",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -71,7 +77,7 @@
         "signingIdentity": null
       },
       "resources": [],
-      "shortDescription": "AIChatWeb App",
+      "shortDescription": "Aivesa",
       "targets": "all",
       "windows": {
         "certificateThumbprint": null,
@@ -85,20 +91,20 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://github.com/Nanjiren01/AIChatWeb/releases/latest/download/latest.json"
+        "https://github.com/ClarenceDan/ChatGPT-Next-Web/releases/latest/download/latest.json"
       ],
       "dialog": false,
       "windows": {
         "installMode": "passive"
       },
-      "pubkey": "to-do"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IERFNDE4MENFM0Y1RTZBOTQKUldTVWFsNC96b0JCM3RqM2NmMnlFTmxIaStRaEJrTHNOU2VqRVlIV1hwVURoWUdVdEc1eDcxVEYK"
     },
     "windows": [
       {
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "AIChatWeb App",
+        "title": "Aivesa Chat",
         "width": 960,
         "hiddenTitle": true,
         "titleBarStyle": "Overlay"

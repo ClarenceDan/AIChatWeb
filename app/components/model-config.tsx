@@ -1,8 +1,4 @@
-import {
-  ModalConfigValidator,
-  ModelConfig,
-  useWebsiteConfigStore,
-} from "../store";
+import { ModalConfigValidator, ModelConfig, useAppConfig, useWebsiteConfigStore } from "../store";
 
 import Locale from "../locales";
 import { InputRange } from "./input-range";
@@ -13,6 +9,8 @@ export function ModelConfigList(props: {
   updateConfig: (updater: (config: ModelConfig) => void) => void;
 }) {
   const { availableModels } = useWebsiteConfigStore();
+  const config = useAppConfig();
+
   return (
     <>
       <ListItem title={Locale.Settings.Model}>
@@ -21,12 +19,19 @@ export function ModelConfigList(props: {
             props.modelConfig.model + "\u0000" + props.modelConfig.contentType
           }
           onChange={(e) => {
+            console.log("Selected value:", e.currentTarget.value);
             props.updateConfig((config) => {
+              console.log("Initial Config:", config);
               const nameAndType = e.currentTarget.value.split("\u0000");
+              console.log("Model:", nameAndType[0]);
+              console.log("ContentType:", nameAndType[1]);
               config.model = ModalConfigValidator.model(nameAndType[0]);
               config.contentType = ModalConfigValidator.modelContentType(
                 nameAndType[1],
               );
+              console.log("Validated Model:", ModalConfigValidator.model(nameAndType[0]));
+              console.log("Validated ContentType:", ModalConfigValidator.modelContentType(nameAndType[1]));
+              console.log("Updated Config:", config);
             });
           }}
         >
@@ -53,28 +58,47 @@ export function ModelConfigList(props: {
           onChange={(e) => {
             props.updateConfig(
               (config) =>
-                (config.temperature = ModalConfigValidator.temperature(
-                  e.currentTarget.valueAsNumber,
-                )),
+              (config.temperature = ModalConfigValidator.temperature(
+                e.currentTarget.valueAsNumber,
+              )),
             );
           }}
         ></InputRange>
       </ListItem>
+      {/* <ListItem
+        title={Locale.Settings.TopP.Title}
+        subTitle={Locale.Settings.TopP.SubTitle}
+      >
+        <InputRange
+          value={(props.modelConfig.top_p ?? 1).toFixed(1)}
+          min="0"
+          max="1"
+          step="0.1"
+          onChange={(e) => {
+            props.updateConfig(
+              (config) =>
+              (config.top_p = ModalConfigValidator.top_p(
+                e.currentTarget.valueAsNumber,
+              )),
+            );
+          }}
+        ></InputRange>
+      </ListItem> */}
       <ListItem
         title={Locale.Settings.MaxTokens.Title}
         subTitle={Locale.Settings.MaxTokens.SubTitle}
       >
         <input
           type="number"
-          min={100}
-          max={32000}
+          min={1024}
+          max={512000}
           value={props.modelConfig.max_tokens}
           onChange={(e) =>
             props.updateConfig(
               (config) =>
-                (config.max_tokens = ModalConfigValidator.max_tokens(
-                  e.currentTarget.valueAsNumber,
-                )),
+              (config.max_tokens = ModalConfigValidator.max_tokens(
+                e.currentTarget.valueAsNumber,
+              )),
             )
           }
         ></input>
@@ -91,10 +115,10 @@ export function ModelConfigList(props: {
           onChange={(e) => {
             props.updateConfig(
               (config) =>
-                (config.presence_penalty =
-                  ModalConfigValidator.presence_penalty(
-                    e.currentTarget.valueAsNumber,
-                  )),
+              (config.presence_penalty =
+                ModalConfigValidator.presence_penalty(
+                  e.currentTarget.valueAsNumber,
+                )),
             );
           }}
         ></InputRange>
@@ -112,13 +136,29 @@ export function ModelConfigList(props: {
           onChange={(e) => {
             props.updateConfig(
               (config) =>
-                (config.frequency_penalty =
-                  ModalConfigValidator.frequency_penalty(
-                    e.currentTarget.valueAsNumber,
-                  )),
+              (config.frequency_penalty =
+                ModalConfigValidator.frequency_penalty(
+                  e.currentTarget.valueAsNumber,
+                )),
             );
           }}
         ></InputRange>
+      </ListItem>
+
+      <ListItem
+        title={Locale.Settings.InjectSystemPrompts.Title}
+        subTitle={Locale.Settings.InjectSystemPrompts.SubTitle}
+      >
+        <input
+          type="checkbox"
+          checked={props.modelConfig.enableInjectSystemPrompts}
+          onChange={(e) =>
+            props.updateConfig(
+              (config) =>
+                (config.enableInjectSystemPrompts = e.currentTarget.checked),
+            )
+          }
+        ></input>
       </ListItem>
 
       <ListItem
@@ -144,7 +184,7 @@ export function ModelConfigList(props: {
           title={props.modelConfig.historyMessageCount.toString()}
           value={props.modelConfig.historyMessageCount}
           min="0"
-          max="32"
+          max="64"
           step="1"
           onChange={(e) =>
             props.updateConfig(
@@ -166,8 +206,8 @@ export function ModelConfigList(props: {
           onChange={(e) =>
             props.updateConfig(
               (config) =>
-                (config.compressMessageLengthThreshold =
-                  e.currentTarget.valueAsNumber),
+              (config.compressMessageLengthThreshold =
+                e.currentTarget.valueAsNumber),
             )
           }
         ></input>

@@ -6,9 +6,9 @@ import { useState, useEffect, useCallback } from "react";
 
 import styles from "./home.module.scss";
 
-import ChatBotIcon from "../icons/ai-chat-bot.png";
+import BotIcon from "../icons/bot.svg";
 import LoadingIcon from "../icons/three-dots.svg";
-import NextImage from "next/image";
+import { Response } from "../api/common";
 
 import { getCSSVar, useMobileScreen } from "../utils";
 
@@ -16,32 +16,33 @@ import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
 import { ErrorBoundary } from "./error";
 
-import { getLang } from "../locales";
+import { getISOLang, getLang } from "../locales";
 
 import {
-  HashRouter as Router,
+  BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
-import { AuthPage } from "./auth";
 import { getClientConfig } from "../config/client";
-import { useWebsiteConfigStore, BOT_HELLO } from "../store";
+import { api } from "../client/api";
+import {
+  useWebsiteConfigStore,
+  useAuthStore,
+  useAccessStore,
+  BOT_HELLO,
+  useWechatConfigStore,
+  useNoticeConfigStore,
+} from "../store";
 
-export function Loading(props: { noLogo?: boolean }) {
+export function Loading(props: {
+  noLogo?: boolean;
+}) {
   return (
     <div className={styles["loading-content"] + " no-dark"}>
-      {!props.noLogo && (
-        <NextImage
-          src={ChatBotIcon.src}
-          width={30}
-          height={30}
-          alt="bot"
-          className="user-avatar"
-        />
-      )}
+      {!props.noLogo && <BotIcon />}
       <LoadingIcon />
     </div>
   );
@@ -50,6 +51,13 @@ export function Loading(props: { noLogo?: boolean }) {
 const Login = dynamic(async () => (await import("./login")).Login, {
   loading: () => <Loading noLogo />,
 });
+
+const WechatCallback = dynamic(
+  async () => (await import("./wechatCallback")).WechatCallback,
+  {
+    loading: () => <Loading noLogo />,
+  },
+);
 
 const Register = dynamic(async () => (await import("./register")).Register, {
   loading: () => <Loading noLogo />,
@@ -73,6 +81,32 @@ const Pricing = dynamic(async () => (await import("./pricing")).Pricing, {
   loading: () => <Loading noLogo />,
 });
 
+const Pay = dynamic(async () => (await import("./pay")).Pay, {
+  loading: () => <Loading noLogo />,
+});
+
+const RedeemCode = dynamic(
+  async () => (await import("./redeem-code")).RedeemCode,
+  {
+    loading: () => <Loading noLogo />,
+  },
+);
+
+const Balance = dynamic(async () => (await import("./balance")).Balance, {
+  loading: () => <Loading noLogo />,
+});
+
+const Invitation = dynamic(
+  async () => (await import("./invitation")).Invitation,
+  {
+    loading: () => <Loading noLogo />,
+  },
+);
+
+const Order = dynamic(async () => (await import("./order")).Order, {
+  loading: () => <Loading noLogo />,
+});
+
 const Chat = dynamic(async () => (await import("./chat")).Chat, {
   loading: () => <Loading noLogo />,
 });
@@ -82,6 +116,10 @@ const NewChat = dynamic(async () => (await import("./new-chat")).NewChat, {
 });
 
 const MaskPage = dynamic(async () => (await import("./mask")).MaskPage, {
+  loading: () => <Loading noLogo />,
+});
+
+const PrivacyPage = dynamic(async () => (await import("./privacy")).PrivacyPage, {
   loading: () => <Loading noLogo />,
 });
 
@@ -95,7 +133,7 @@ export interface NoticeConfigData {
   noticeContent: NoticeConfig;
 }
 
-import { Response } from "../api/common";
+
 export type NoticeConfigResponse = Response<NoticeConfigData>;
 
 export function useSwitchTheme() {
@@ -128,10 +166,18 @@ export function useSwitchTheme() {
       metaDescriptionLight?.setAttribute("content", themeColor);
     }
   }, [config.theme]);
+}
 
+
+function useHtmlLang() {
   useEffect(() => {
-    document.title = useWebsiteConfig.title || "AI Chat";
-  }, [useWebsiteConfig.title]);
+    const lang = getISOLang();
+    const htmlLang = document.documentElement.lang;
+
+    if (lang !== htmlLang) {
+      document.documentElement.lang = lang;
+    }
+  }, []);
 }
 
 const useHasHydrated = () => {
@@ -144,18 +190,16 @@ const useHasHydrated = () => {
   return hasHydrated;
 };
 
-const loadAsyncGoogleFont = () => {
-  const linkEl = document.createElement("link");
-  const proxyFontUrl = "/google-fonts";
-  const remoteFontUrl = "https://fonts.googleapis.com";
-  const googleFontUrl =
-    getClientConfig()?.buildMode === "export" ? remoteFontUrl : proxyFontUrl;
-  linkEl.rel = "stylesheet";
-  linkEl.href =
-    googleFontUrl +
-    "/css2?family=Noto+Sans+SC:wght@300;400;700;900&display=swap";
-  document.head.appendChild(linkEl);
-};
+function sameDate(d1: Date, d2: Date) {
+  if (d1.constructor.name === "String") {
+    d1 = new Date(d1);
+  }
+  return (
+    d1.getDate() === d2.getDate() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getFullYear() === d2.getFullYear()
+  );
+}
 
 function Screen() {
   const config = useAppConfig();
@@ -163,17 +207,14 @@ function Screen() {
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
   const isMobileScreen = useMobileScreen();
+  const shouldTightBorder = getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
 
+  const { fetchWechatConfig } = useWechatConfigStore();
   useEffect(() => {
-    loadAsyncGoogleFont();
-  }, []);
+    fetchWechatConfig();
+  }, [fetchWechatConfig]);
 
-  // const { fetchWebsiteConfig } = useWebsiteConfigStore();
-  // useEffect(() => {
-  //   fetchWebsiteConfig();
-  // }, [fetchWebsiteConfig]);
-
-  const { botHello } = useWebsiteConfigStore();
+  const { botHello, icp } = useWebsiteConfigStore();
   useEffect(() => {
     if (botHello) {
       // todo i18n
@@ -182,91 +223,116 @@ function Screen() {
   }, [botHello]);
 
   const [noticeShow, setNoticeShow] = useState(false);
-  const [noticeTitle, setNoticeTitle] = useState("");
-  const [noticeContent, setNoticeContent] = useState("");
+  const noticeStore = useNoticeConfigStore();
   useEffect(() => {
-    const url = "/globalConfig/notice";
-    const BASE_URL = process.env.BASE_URL;
-    const mode = process.env.BUILD_MODE;
-    let requestUrl = mode === "export" ? BASE_URL + url : "/api" + url;
-    fetch(requestUrl, {
-      method: "get",
-    })
-      .then((res) => res.json())
-      .then((res: NoticeConfigResponse) => {
-        console.log("[GlobalConfig] got notice config from server", res);
-        const notice = res.data.noticeContent;
-        if (notice.show) {
-          setNoticeTitle(notice.title);
-          setNoticeContent(notice.content);
-          if (notice.splash) {
+    noticeStore.fetchNoticeConfig().then((res: NoticeConfigResponse) => {
+      const notice = res?.data.noticeContent;
+      if (notice) {
+        if (notice.show && notice.splash) {
+          const todayShow =
+            noticeStore.notShowToday === null
+              ? true
+              : !sameDate(noticeStore.notShowToday, new Date());
+          if (todayShow) {
             setNoticeShow(true);
           }
         }
-      })
-      .catch(() => {
-        console.error("[GlobalConfig] failed to fetch config");
-      })
-      .finally(() => {
-        // fetchState = 2;
-      });
+      }
+    });
   }, []);
 
-  return (
-    <div
-      className={
-        styles.container +
-        ` ${
-          config.tightBorder && !isMobileScreen
-            ? styles["tight-container"]
-            : styles.container
-        } ${getLang() === "ar" ? styles["rtl-screen"] : ""}`
-      }
-    >
-      {isAuth ? (
-        <>
-          <AuthPage />
-        </>
-      ) : (
-        <>
-          <SideBar
-            className={isHome ? styles["sidebar-show"] : ""}
-            noticeShow={noticeShow}
-            noticeTitle={noticeTitle}
-            noticeContent={noticeContent}
-            setNoticeShow={setNoticeShow}
-          />
+  function setNoticeNotShowToday(notShowToday: boolean) {
+    noticeStore.setNotShowToday(notShowToday);
+  }
 
-          <div className={styles["window-content"]} id={SlotID.AppBody}>
-            <Routes>
-              <Route path={Path.Home} element={<Chat />} />
-              <Route path={Path.NewChat} element={<NewChat />} />
-              <Route path={Path.Masks} element={<MaskPage />} />
-              <Route path={Path.Chat} element={<Chat />} />
-              <Route path={Path.Settings} element={<Settings />} />
-              <Route path={Path.Login} element={<Login />} />
-              <Route path={Path.Register} element={<Register />} />
-              <Route path={Path.ForgetPassword} element={<ForgetPassword />} />
-              <Route path={Path.Profile} element={<Profile />} />
-              <Route path={Path.Pricing} element={<Pricing />} />
-            </Routes>
-          </div>
-        </>
-      )}
+  const hideChatLogWhenNotLogin = true
+  const separator =
+    hideChatLogWhenNotLogin &&
+    (
+      [
+        Path.Login,
+        Path.Register,
+        Path.WechatCallback,
+        Path.ForgetPassword,
+      ] as string[]
+    ).includes(location.pathname);
+
+  return (
+      <div className={(separator ? "separator-page " : "") + "body"}>
+      <div
+        className={
+          styles.container +
+          ` ${shouldTightBorder ? styles["tight-container"] : styles.container} `
+        }
+      >
+        <SideBar
+          className={isHome ? styles["sidebar-show"] : ""}
+          noticeShow={noticeShow}
+          noticeTitle={noticeStore.title}
+          noticeContent={noticeStore.content}
+          noticeNotShowToday={noticeStore.notShowToday}
+          showNotice={() => setNoticeShow(true)}
+          setNoticeShow={(show: boolean, notShowToday: boolean) => {
+            setNoticeShow(show);
+            setNoticeNotShowToday(notShowToday);
+          }}
+        />
+
+        <div className={styles["window-content"]} id={SlotID.AppBody}>
+          <Routes>
+            <Route path={Path.Home} element={<Chat />} />
+            <Route path={Path.NewChat} element={<NewChat />} />
+            <Route path={Path.Masks} element={<MaskPage />} />
+            <Route path={Path.Chat} element={<Chat />} />
+            <Route path={Path.Settings} element={<Settings />} />
+            <Route path={Path.PrivacyPage} element={<PrivacyPage />} />
+            <Route path={Path.Login} element={<Login />} />
+            <Route path={Path.WechatCallback} element={<WechatCallback />} />
+            <Route path={Path.Register} element={<Register />} />
+            <Route path={Path.ForgetPassword} element={<ForgetPassword />} />
+            <Route path={Path.Profile} element={<Profile />} />
+            <Route path={Path.Pricing} element={<Pricing />} />
+            <Route path={Path.RedeemCode} element={<RedeemCode />} />
+            <Route path={Path.Pay} element={<Pay />} />
+            <Route path={Path.Balance} element={<Balance />} />
+            <Route path={Path.Invitation} element={<Invitation />} />
+            <Route path={Path.Order} element={<Order />} />
+          </Routes>
+        </div>
+      </div>
     </div>
   );
 }
 
+export function useLoadData() {
+  const config = useAppConfig();
+
+  useEffect(() => {
+    (async () => {
+      const models = await api.llm.models();
+      config.mergeModels(models);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
+let runAIChatWebInitScript = false;
 export function Home() {
   useSwitchTheme();
+  useLoadData();
+  useHtmlLang();
 
-  const { fetchWebsiteConfig, availableModels } = useWebsiteConfigStore();
+  const authStore = useAuthStore();
+  const { fetchWebsiteConfig, globalJavaScript, availableModels } =
+    useWebsiteConfigStore();
+
   useEffect(() => {
     fetchWebsiteConfig();
   }, [fetchWebsiteConfig]);
 
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
+    useAccessStore.getState().fetch();
   }, []);
   useEffect(() => {
     console.log("set default model", availableModels[0]);
@@ -279,6 +345,14 @@ export function Home() {
       useAppConfig.getState().modelConfig.contentType = "Text";
     }
   }, [availableModels]);
+  useEffect(() => {
+    if (globalJavaScript) {
+      if (!runAIChatWebInitScript) {
+        eval(globalJavaScript);
+        runAIChatWebInitScript = true;
+      }
+    }
+  }, [globalJavaScript]);
 
   if (!useHasHydrated()) {
     return <Loading />;

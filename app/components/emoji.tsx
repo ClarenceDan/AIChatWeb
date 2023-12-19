@@ -4,10 +4,11 @@ import EmojiPicker, {
   Theme as EmojiTheme,
 } from "emoji-picker-react";
 
-import { ModelType } from "../store";
+import { ModelType, ModelContentType, useWebsiteConfigStore } from "../store";
 
-import BotIcon from "../icons/ai-chat-bot.png";
-import BlackBotIcon from "../icons/ai-chat-bot.png"; // 暂时都一样
+import BotIcon from "../icons/bot.svg";
+import BlackBotIcon from "../icons/bot-pro.svg"; // 颜色加深
+import ImgBotIcon from "../icons/bot-img.svg"; // 颜色加深
 import NextImage from "next/image";
 
 export function getEmojiUrl(unified: string, style: EmojiStyle) {
@@ -29,29 +30,33 @@ export function AvatarPicker(props: {
   );
 }
 
-export function Avatar(props: { model?: ModelType; avatar?: string }) {
+export function Avatar(props: { model?: ModelType; avatar?: string, contentType?: ModelContentType }) {
   if (props.model) {
-    return (
-      <div className="no-dark">
-        {props.model?.startsWith("gpt-4") ? (
-          <NextImage
-            src={BlackBotIcon.src}
-            width={30}
-            height={30}
-            alt="bot"
-            className="user-avatar"
-          />
-        ) : (
-          <NextImage
-            src={BotIcon.src}
-            width={30}
-            height={30}
-            alt="bot"
-            className="user-avatar"
-          />
-        )}
-      </div>
-    );
+    if (props.contentType ==="Image") {
+      return (
+        <div className="no-dark">
+          <ImgBotIcon className="user-avatar" />
+        </div>
+      );
+    } else if (props.model?.includes("Midj")) {
+      return (
+        <div className="no-dark">
+          <ImgBotIcon className="user-avatar" />
+        </div>
+      );
+    } else if (props.model?.includes("4.0")) {
+      return (
+        <div className="no-dark">
+          <BlackBotIcon className="user-avatar" />
+        </div>
+      );
+    } else {
+      return (
+        <div className="no-dark">
+          <BotIcon className="user-avatar" />
+        </div>
+      );
+    }
   }
 
   return (

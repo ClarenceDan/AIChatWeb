@@ -31,12 +31,41 @@ export async function copyToClipboard(text: string) {
   }
 }
 
-export function downloadAs(text: string, filename: string) {
-  const element = document.createElement("a");
-  element.setAttribute(
-    "href",
-    "data:text/plain;charset=utf-8," + encodeURIComponent(text),
-  );
+export async function downloadAs(text: string, filename: string) {
+  if (window.__TAURI__) {
+    const result = await window.__TAURI__.dialog.save({
+      defaultPath: `${filename}`,
+      filters: [
+        {
+          name: `${filename.split('.').pop()} files`,
+          extensions: [`${filename.split('.').pop()}`],
+        },
+        {
+          name: "All Files",
+          extensions: ["*"],
+        },
+      ],
+    });
+
+    if (result !== null) {
+      try {
+        await window.__TAURI__.fs.writeBinaryFile(
+          result,
+          new Uint8Array([...text].map((c) => c.charCodeAt(0)))
+        );
+        showToast(Locale.Download.Success);
+      } catch (error) {
+        showToast(Locale.Download.Failed);
+      }
+    } else {
+      showToast(Locale.Download.Failed);
+    }
+  } else {
+    const element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      "data:text/plain;charset=utf-8," + encodeURIComponent(text),
+    );
   element.setAttribute("download", filename);
 
   element.style.display = "none";
@@ -46,7 +75,7 @@ export function downloadAs(text: string, filename: string) {
 
   document.body.removeChild(element);
 }
-
+}
 export function readFromFile() {
   return new Promise<string>((res, rej) => {
     const fileInput = document.createElement("input");
@@ -107,6 +136,10 @@ export function isFirefox() {
   return (
     typeof navigator !== "undefined" && /firefox/i.test(navigator.userAgent)
   );
+}
+
+export function isMobile() {
+  return /Mobi|Android|iPhone/i.test(navigator.userAgent);
 }
 
 export function selectOrCopy(el: HTMLElement, content: string) {
@@ -172,4 +205,44 @@ export function autoGrowTextArea(dom: HTMLTextAreaElement) {
 
 export function getCSSVar(varName: string) {
   return getComputedStyle(document.body).getPropertyValue(varName).trim();
+}
+
+/**
+ * Detects Macintosh
+ */
+export function isMacOS(): boolean {
+  if (typeof window !== "undefined") {
+    let userAgent = window.navigator.userAgent.toLocaleLowerCase();
+    const macintosh = /iphone|ipad|ipod|macintosh/.test(userAgent)
+    return !!macintosh
+  }
+  return false
+}
+export function toYYYYMMDD_HHMMSS(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+// 将字符串转换为时间
+export function fromYYYYMMDD_HHMMSS(dateString: string): Date {
+  const parts = dateString.split(/[- :]/);
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const day = parseInt(parts[2], 10);
+  const hours = parseInt(parts[3], 10);
+  const minutes = parseInt(parts[4], 10);
+  const seconds = parseInt(parts[5], 10);
+
+  return new Date(year, month, day, hours, minutes, seconds);
+}
+
+export function getSecondsDiff(date1: Date, date2: Date) {
+  const diff = Math.abs(date1.getTime() - date2.getTime());
+  return Math.floor(diff / 1000);
 }

@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
-export const OPENAI_URL = "api.openai.com";
-const DEFAULT_PROTOCOL = "https";
-const PROTOCOL = process.env.PROTOCOL ?? DEFAULT_PROTOCOL;
-const BASE_URL = process.env.BASE_URL ?? OPENAI_URL;
-const DISABLE_GPT4 = !!process.env.DISABLE_GPT4;
+export const OPENAI_URL = "aichat-admin:8080";
+const DEFAULT_PROTOCOL = "http";
+const PROTOCOL = process.env.PROTOCOL || DEFAULT_PROTOCOL;
+const BASE_URL = process.env.BASE_URL || OPENAI_URL;
 
 export async function requestOpenai(req: NextRequest) {
   const controller = new AbortController();
   const authValue = req.headers.get("Authorization") ?? "";
+  // console.log("[Original Proxy] ", req.nextUrl.pathname);
   const openaiPath = `${req.nextUrl.pathname}${req.nextUrl.search}`.replaceAll(
     "/api/",
     "",
@@ -20,8 +20,14 @@ export async function requestOpenai(req: NextRequest) {
     baseUrl = `${PROTOCOL}://${baseUrl}`;
   }
 
-  console.log("[Proxy] ", openaiPath);
-  console.log("[Base Url]", baseUrl);
+  if (baseUrl.endsWith('/')) {
+    baseUrl = baseUrl.slice(0, -1);
+  }
+
+  // console.log("[Proxy] ", openaiPath);
+  // console.log("[Base Url]", baseUrl);
+  // console.log("[requestOpenai] Sending request with details:", req);
+
 
   // if (process.env.OPENAI_ORG_ID) {
   //   console.log("[Org ID]", process.env.OPENAI_ORG_ID);
@@ -32,21 +38,25 @@ export async function requestOpenai(req: NextRequest) {
   }, 10 * 60 * 1000);
 
   const fetchUrl = `${baseUrl}/${openaiPath}`;
+  console.log("[Fetch Url]", fetchUrl);
   const fetchOptions: RequestInit = {
     headers: {
       "Content-Type": "application/json",
+      "Cache-Control": "no-store",
       Authorization: authValue,
       ...(process.env.OPENAI_ORG_ID && {
         "OpenAI-Organization": process.env.OPENAI_ORG_ID,
       }),
     },
-    cache: "no-store",
     method: req.method,
     body: req.body,
+    // to fix #2485: https://stackoverflow.com/questions/55920957/cloudflare-worker-typeerror-one-time-use-body
+    redirect: "manual",
     // @ts-ignore
     duplex: "half",
     signal: controller.signal,
   };
+
 
   try {
     const res = await fetch(fetchUrl, fetchOptions);
@@ -87,9 +97,18 @@ export async function request(req: NextRequest) {
 
   try {
     console.log(`url = ${baseUrl}/${uri}`);
+    // console.log('req.headers', req.headers)
+    const contentType =
+      req.headers.get("Content-Type") ||
+      req.headers.get("content-type") ||
+      "application/json";
+    const newContentType = contentType.startsWith("multipart/form-data")
+      ? contentType
+      : "application/json";
+    // console.log('contentType = ' + contentType + ', newContentType = ' + newContentType)
     const res = await fetch(`${baseUrl}/${uri}`, {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": newContentType,
         Authorization: authValue,
       },
       cache: "no-store",

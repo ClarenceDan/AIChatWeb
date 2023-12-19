@@ -8,6 +8,7 @@ export function IconButton(props: {
   onClick?: () => void;
   icon?: JSX.Element;
   type?: ButtonType;
+  style?: object;
   text?: string;
   block?: boolean;
   bordered?: boolean;
@@ -17,9 +18,11 @@ export function IconButton(props: {
   disabled?: boolean;
   tabIndex?: number;
   autoFocus?: boolean;
+  ref?: React.LegacyRef<HTMLButtonElement>;
 }) {
   return (
     <button
+      ref={props.ref}
       className={
         styles["icon-button"] +
         ` ${props.bordered && styles.border} ${props.shadow && styles.shadow} ${
@@ -30,6 +33,7 @@ export function IconButton(props: {
       title={props.title}
       disabled={props.disabled}
       role="button"
+      style={props.style}
       tabIndex={props.tabIndex}
       autoFocus={props.autoFocus}
     >
@@ -50,13 +54,3 @@ export function IconButton(props: {
     </button>
   );
 }
-
-// export function Button(props: {
-//   onClick?: () => void;
-// }) {
-//   return (
-//     <button>
-
-//     </button>
-//   )
-// }

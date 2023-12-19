@@ -1,12 +1,6 @@
 import { getClientConfig } from "../config/client";
 import { ACCESS_CODE_PREFIX } from "../constant";
-import {
-  ChatMessage,
-  ModelType,
-  PluginActionModel,
-  useAccessStore,
-  useAuthStore,
-} from "../store";
+import { ChatMessage, ModelType, PluginActionModel, useAuthStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 
 export const ROLES = ["system", "user", "assistant"] as const;
@@ -26,7 +20,7 @@ export interface LLMConfig {
   model: string;
   contentType?: ContentType;
   temperature?: number;
-  top_p?: number;
+  // top_p?: number;
   stream?: boolean;
   presence_penalty?: number;
   frequency_penalty?: number;
@@ -34,11 +28,13 @@ export interface LLMConfig {
 
 export interface ChatOptions {
   messages: RequestMessage[];
+  userMessage?: ChatMessage;
   botMessage: ChatMessage;
   content: string;
-
   config: LLMConfig;
   plugins: PluginActionModel[];
+  imageMode: string;
+  baseImages: any[];
 
   onUpdate?: (message: string, chunk: string) => void;
   onFinish: (message: string) => void;
@@ -46,14 +42,25 @@ export interface ChatOptions {
   onController?: (controller: AbortController) => void;
 }
 
-export interface LLMUsage {
-  used: number;
-  total: number;
+export interface LLMModel {
+  name: string;
+  available: boolean;
+}
+
+export interface ChatSubmitResult {
+  userMessage?: ChatMessage;
+  botMessage: ChatMessage;
+  fetch: boolean;
 }
 
 export abstract class LLMApi {
-  abstract chat(options: ChatOptions): Promise<void>;
-  abstract usage(): Promise<LLMUsage>;
+  abstract chat(options: ChatOptions): Promise<ChatSubmitResult | void>;
+  abstract models(): Promise<LLMModel[]>;
+  abstract fetchDrawStatus: (
+    onUpdate: ((message: string, chunk: string) => void) | undefined,
+    onFinish: (message: string) => void,
+    botMessage: ChatMessage,
+  ) => Promise<boolean | void>;
 }
 
 type ProviderName = "openai" | "azure" | "claude" | "palm";
@@ -84,11 +91,11 @@ export class ClientApi {
     this.llm = new ChatGPTApi();
   }
 
-  config() {}
+  config() { }
 
-  prompts() {}
+  prompts() { }
 
-  masks() {}
+  masks() { }
 
   async share(messages: ChatMessage[], avatarUrl: string | null = null) {
     const msgs = messages
@@ -100,13 +107,13 @@ export class ClientApi {
         {
           from: "human",
           value:
-            "Share from [AIChatWeb]: https://github.com/Nanjiren01/AIChatWeb",
+            "Share from [ChatGPT Next Web]: https://github.com/Yidadaa/ChatGPT-Next-Web",
         },
       ]);
     // 敬告二开开发者们，为了开源大模型的发展，请不要修改上述消息，此消息用于后续数据清洗使用
     // Please do not modify this message
 
-    console.log("[Share]", msgs);
+    console.log("[Share]", messages, msgs);
     const clientConfig = getClientConfig();
     const proxyUrl = "/sharegpt";
     const rawUrl = "https://sharegpt.com/api/conversations";
@@ -134,7 +141,6 @@ export const api = new ClientApi();
 
 export function getHeaders() {
   const authStore = useAuthStore.getState();
-  const accessStore = useAccessStore.getState();
   let headers: Record<string, string> = {
     "Content-Type": "application/json",
     "x-requested-with": "XMLHttpRequest",
@@ -146,17 +152,5 @@ export function getHeaders() {
   if (validString(authStore.token)) {
     headers.Authorization = makeBearer(authStore.token);
   }
-  // use user's api key first
-  else if (validString(accessStore.token)) {
-    headers.Authorization = makeBearer(accessStore.token);
-  } else if (
-    accessStore.enabledAccessControl() &&
-    validString(accessStore.accessCode)
-  ) {
-    headers.Authorization = makeBearer(
-      ACCESS_CODE_PREFIX + accessStore.accessCode,
-    );
-  }
-
   return headers;
 }
