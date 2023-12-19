@@ -1,6 +1,10 @@
+import { getClientConfig } from "../config/client";
 import { SubmitKey } from "../store/config";
 import { LocaleType } from "./index";
 
+// if you are adding a new translation, please use PartialLocaleType instead of LocaleType
+
+const isApp = !!getClientConfig()?.isApp;
 const en: LocaleType = {
   WIP: "Coming Soon...",
   Error: {
@@ -11,6 +15,7 @@ const en: LocaleType = {
   Auth: {
     Title: "Need Access Code",
     Tips: "Please enter access code below",
+    SubTips: "Or enter your OpenAI API Key",
     Input: "access code",
     Confirm: "Confirm",
     Later: "Later",
@@ -24,6 +29,13 @@ const en: LocaleType = {
   },
   Chat: {
     SubTitle: (count: number) => `${count} messages`,
+    EditMessage: {
+      Title: "Edit All Messages",
+      Topic: {
+        Title: "Topic",
+        SubTitle: "Change the current topic",
+      },
+    },
     Actions: {
       ChatList: "Go To Chat List",
       CompressedHistory: "Compressed History Memory Prompt",
@@ -32,7 +44,7 @@ const en: LocaleType = {
       Stop: "Stop",
       Retry: "Retry",
       Pin: "Pin",
-      PinToastContent: "Pinned 2 messages to contextual prompts",
+      PinToastContent: "Pinned 1 messages to contextual prompts",
       PinToastAction: "View",
       Delete: "Delete",
       Edit: "Edit",
@@ -59,6 +71,7 @@ const en: LocaleType = {
       Settings: "Settings",
       Internet: "Access Internet",
     },
+    TooFrequently: "您发送太快啦，请稍后重试",
     Rename: "Rename Chat",
     Typing: "Typing…",
     SensitiveWordsTip: (question: string) =>
@@ -78,20 +91,30 @@ const en: LocaleType = {
     Config: {
       Reset: "Reset to Default",
       SaveAs: "Save as Mask",
+      Confirm: "Confirm",
     },
+    IsContext: "Contextual Prompt",
   },
   Midjourney: {
+    Uploading: "Uploading",
     SelectImgMax: (max: number) => `Select up to ${max} images`,
     InputDisabled: "Input is disabled in this mode",
+    NotSupports: "not supports",
     HasImgTip:
       "Tip: In the mask mode, only the first image will be used. In the blend mode, the five selected images will be used in order (click the image to remove it)",
     ModeImagineUseImg: "Mask Mode",
     ModeBlend: "Blend Mode",
     ModeDescribe: "Describe Mode",
     NeedInputUseImgPrompt:
-      'You need to enter content to use the image in the mask mode, please enter the content starting with "/mj"',
+      "You need to enter content to use the image in the mask mode, please input the content",
+    ImagineMaxImg: (max: number) =>
+      `up to ${max} iamges are required in the Mask mode`,
+    gpt4vMaxImg: (max: number) =>
+      `up to ${max} iamges are required in this mode`,
     BlendMinImg: (min: number, max: number) =>
       `At least ${min} images are required in the mixed image mode, and up to ${max} images are required`,
+    DescribeMaxImg: (max: number) =>
+      `up to ${max} iamges are required in the describe mode`,
     TaskErrUnknownType: "Task submission failed: unknown task type",
     TaskErrNotSupportType: (type: string) =>
       `Task submission failed: unsupported task type -> ${type}`,
@@ -109,8 +132,9 @@ const en: LocaleType = {
     TaskStatus: "Task status",
     TaskRemoteSubmit: "Task has been submitted to Midjourney server",
     TaskProgressTip: (progress: number | undefined) =>
-      `Task is running${progress ? `, current progress: ${progress}` : ""}`,
+      `Drawing${progress ? `, current progress: ${progress}%` : ""}`,
     TaskNotStart: "Task has not started",
+    Refresh: "Refresh",
     Url: "URL",
     SettingProxyCoverTip:
       "The MidjourneyProxy address defined here will override the MIDJOURNEY_PROXY_URL in the environment variables",
@@ -137,6 +161,10 @@ const en: LocaleType = {
       Select: "Select",
       Preview: "Preview",
     },
+    Image: {
+      Toast: "Capturing Image...",
+      Modal: "Long press or right click to save image",
+    },
   },
   Select: {
     Search: "Search",
@@ -152,6 +180,8 @@ const en: LocaleType = {
     Reset: "Reset Session",
     ResetConfirm:
       "Resetting will clear the current conversation history and historical memory. Are you sure you want to reset?",
+    CloseConfirm:
+      "You have changed some items. Are you sure quit without saving?",
   },
   Home: {
     NewChat: "New Chat",
@@ -205,6 +235,16 @@ const en: LocaleType = {
       SubTitle: "系统将向您邮箱发送的验证码",
       Placeholder: "请输入验证码",
     },
+    Phone: {
+      Title: "手机号",
+      SubTitle: "",
+      Placeholder: "请输入手机号",
+    },
+    PhoneCode: {
+      Title: "验证码",
+      SubTitle: "系统将向您手机号发送的短信验证码",
+      Placeholder: "请输入短信验证码",
+    },
     Username: {
       Title: "用户名",
       SubTitle: "",
@@ -238,6 +278,14 @@ const en: LocaleType = {
       EmailFormatError: "邮箱格式不正确",
       EmailCodeEmpty: "请输入邮箱验证码",
       EmailExistsError: "该邮箱已注册",
+      SendPhoneCode: "发送短信验证码",
+      PhoneCodeSending: "验证码发送中",
+      PhoneCodeSent: "验证码已发送，请查看短信",
+      PhoneIsEmpty: "请输入手机号",
+      PhoneCodeSentFrequently: "验证码发送过于频繁，请稍后再试",
+      PhoneFormatError: "手机号格式不正确",
+      PhoneCodeEmpty: "请输入短信验证码",
+      PhoneExistsError: "该手机号已注册",
     },
     GoToLogin: "前往登录",
     Captcha: "",
@@ -268,27 +316,42 @@ const en: LocaleType = {
     SubTitle: "个人中心",
     Username: "账号",
     Email: "邮箱",
+    Phone: "手机号",
+    Invitor: {
+      Title: "邀请人",
+    },
+    InviteCode: {
+      Title: "邀请码",
+      TitleRequired: "邀请码(必填)",
+      Placeholder: "输入邀请码获得额外权益",
+    },
     Tokens: {
       Title: "tokens",
-      SubTitle: "剩余tokens数量",
+      SubTitle: "",
     },
     ChatCount: {
-      Title: "询问次数",
-      SubTitle: "剩余询问次数（GPT3.5等）",
+      Title: "聊天积分",
+      SubTitle: "",
     },
     AdvanceChatCount: {
-      Title: "询问次数（GPT4）",
-      SubTitle: "聊天询问次数（GPT4）",
+      Title: "高级聊天积分",
+      SubTitle: "",
     },
     DrawCount: {
-      Title: "绘图次数",
-      SubTitle: "剩余绘图次数",
+      Title: "绘图积分",
+      SubTitle: "",
     },
     Actions: {
       Close: "关闭",
       Pricing: "购买套餐",
+      Order: "订单中心",
+      BalanceLog: "额度变动记录",
       GoToBalanceList: "更多",
       ConsultAdministrator: "请咨询站长",
+      All: "所有套餐",
+      CreateInviteCode: "生成邀请码",
+      Copy: "复制链接",
+      Redeem: "兑换码",
     },
     BalanceItem: {
       Title: "套餐类型",
@@ -301,8 +364,19 @@ const en: LocaleType = {
       },
     },
     ExpireList: {
-      Title: "过期时间",
+      Title: "到期时间",
       SubTitle: "",
+    },
+  },
+  RedeemCodePage: {
+    Title: "兑换码",
+    RedeemCodeInput: {
+      Title: "兑换码",
+      Placeholder: "请输入兑换码",
+    },
+    Actions: {
+      Close: "关闭",
+      Redeem: "开始兑换",
     },
   },
   PricingPage: {
@@ -311,11 +385,81 @@ const en: LocaleType = {
     Actions: {
       Close: "关闭",
       Buy: " 购 买 ",
+      Order: "订单中心",
+      RedeemCode: "兑换码",
     },
     NoPackage: "暂无可用套餐",
-    Loading: "套餐加载中……",
+    Loading: "请稍候……",
     PleaseLogin: "请先登录",
     ConsultAdministrator: "请咨询站长",
+    BuyFailedCause: "套餐购买失败！原因：",
+    TOO_FREQUENCILY: "操作过于频繁，请稍后再试",
+    CREATE_ORDER_FAILED: "创建订单失败",
+  },
+  PayPage: {
+    PaidSuccess: "支付成功",
+    Actions: {
+      Close: "关闭",
+    },
+  },
+  BalancePage: {
+    Title: "已购套餐",
+    NoBalance: "您尚未购买任何套餐",
+    Loading: "请稍候……",
+    Actions: {
+      Close: "关闭",
+      Pricing: "购买套餐",
+      Order: "订单中心",
+      Profile: "个人中心",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+      RedeemCode: "兑换码",
+      BalanceLog: "额度变动记录",
+    },
+  },
+  InvitationPage: {
+    Title: "邀请记录",
+    NoInvitation: "快将邀请链接分享给朋友吧",
+    Loading: "请稍候……",
+    Actions: {
+      Close: "关闭",
+      Profile: "个人中心",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+    },
+  },
+  BalanceLogPage: {
+    Title: "额度变动记录",
+    NoBalance: "暂无记录",
+    Loading: "请稍候……",
+    Actions: {
+      Close: "关闭",
+      Profile: "个人中心",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+      Balance: "所有套餐",
+    },
+  },
+  OrderPage: {
+    Title: "Order Center",
+    NoOrder: "No Order",
+    Loading: "请稍候……",
+    StateError: "状态错误！",
+    CancelFailedForStateError: "当前状态下无法取消",
+    CancelSuccess: "订单取消成功",
+    CancelFailure: "订单取消失败",
+    TryAgainLaster: "操作失败，请稍候重试",
+    PleaseWaitForDataSync:
+      "数据可能延迟，支付成功请在10分钟后查看订单状态，请勿重复支付",
+    Actions: {
+      Pay: "支付",
+      Cancel: "取消",
+      Pricing: "购买套餐",
+      Profile: "个人中心",
+      Copy: "复制",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+    },
   },
   Settings: {
     Title: "Settings",
@@ -343,7 +487,10 @@ const en: LocaleType = {
       Title: "Font Size",
       SubTitle: "Adjust font size of chat content",
     },
-
+    InjectSystemPrompts: {
+      Title: "Inject System Prompts",
+      SubTitle: "Inject a global system prompt for every request",
+    },
     InputTemplate: {
       Title: "Input Template",
       SubTitle: "Newest message will be filled to this template",
@@ -364,9 +511,63 @@ const en: LocaleType = {
       Title: "Send Preview Bubble",
       SubTitle: "Preview markdown in bubble",
     },
+    AutoGenerateTitle: {
+      Title: "Auto Generate Title",
+      SubTitle: "Generate a suitable title based on the conversation content",
+    },
+    Sync: {
+      CloudState: "Last Update",
+      NotSyncYet: "Not sync yet",
+      Success: "Sync Success",
+      Fail: "Sync Fail",
+
+      Config: {
+        Modal: {
+          Title: "Config Sync",
+          Check: "Check Connection",
+        },
+        SyncType: {
+          Title: "Sync Type",
+          SubTitle: "Choose your favorite sync service",
+        },
+        Proxy: {
+          Title: "Enable CORS Proxy",
+          SubTitle: "Enable a proxy to avoid cross-origin restrictions",
+        },
+        ProxyUrl: {
+          Title: "Proxy Endpoint",
+          SubTitle:
+            "Only applicable to the built-in CORS proxy for this project",
+        },
+
+        WebDav: {
+          Endpoint: "WebDAV Endpoint",
+          UserName: "User Name",
+          Password: "Password",
+        },
+
+        UpStash: {
+          Endpoint: "UpStash Redis REST Url",
+          UserName: "Backup Name",
+          Password: "UpStash Redis REST Token",
+        },
+      },
+
+      LocalState: "Local Data",
+      Overview: (overview: any) => {
+        return `${overview.chat} chats，${overview.message} messages，${overview.prompt} prompts，${overview.mask} masks`;
+      },
+      ImportFailed: "Failed to import from file",
+    },
     Mask: {
-      Title: "Mask Splash Screen",
-      SubTitle: "Show a mask splash screen before starting new chat",
+      Splash: {
+        Title: "Mask Splash Screen",
+        SubTitle: "Show a mask splash screen before starting new chat",
+      },
+      Builtin: {
+        Title: "Hide Builtin Masks",
+        SubTitle: "Hide builtin masks in mask list",
+      },
     },
     Prompt: {
       Disable: {
@@ -395,11 +596,7 @@ const en: LocaleType = {
       SubTitle:
         "Will compress if uncompressed messages length exceeds the value",
     },
-    Token: {
-      Title: "API Key",
-      SubTitle: "Use your key to ignore access code limit",
-      Placeholder: "OpenAI API Key",
-    },
+
     Usage: {
       Title: "Account Balance",
       SubTitle(used: any, total: any) {
@@ -409,19 +606,63 @@ const en: LocaleType = {
       Check: "Check",
       NoAccess: "Enter API Key to check balance",
     },
-    AccessCode: {
-      Title: "Access Code",
-      SubTitle: "Access control enabled",
-      Placeholder: "Need Access Code",
+    Access: {
+      AccessCode: {
+        Title: "Access Code",
+        SubTitle: "Access control Enabled",
+        Placeholder: "Enter Code",
+      },
+      CustomEndpoint: {
+        Title: "Custom Endpoint",
+        SubTitle: "Use custom Azure or OpenAI service",
+      },
+      Provider: {
+        Title: "Model Provider",
+        SubTitle: "Select Azure or OpenAI",
+      },
+      OpenAI: {
+        ApiKey: {
+          Title: "OpenAI API Key",
+          SubTitle: "User custom OpenAI Api Key",
+          Placeholder: "sk-xxx",
+        },
+
+        Endpoint: {
+          Title: "OpenAI Endpoint",
+          SubTitle: "Must starts with http(s):// or use /api/openai as default",
+        },
+      },
+      Azure: {
+        ApiKey: {
+          Title: "Azure Api Key",
+          SubTitle: "Check your api key from Azure console",
+          Placeholder: "Azure Api Key",
+        },
+
+        Endpoint: {
+          Title: "Azure Endpoint",
+          SubTitle: "Example: ",
+        },
+
+        ApiVerion: {
+          Title: "Azure Api Version",
+          SubTitle: "Check your api version from azure console",
+        },
+      },
+      CustomModel: {
+        Title: "Custom Models",
+        SubTitle: "Custom model options, seperated by comma",
+      },
     },
-    Endpoint: {
-      Title: "Endpoint",
-      SubTitle: "Custom endpoint must start with http(s)://",
-    },
+
     Model: "Model",
     Temperature: {
       Title: "Temperature",
       SubTitle: "A larger value makes the more random output",
+    },
+    TopP: {
+      Title: "Top P",
+      SubTitle: "Do not alter this value together with temperature",
     },
     MaxTokens: {
       Title: "Max Tokens",
@@ -459,15 +700,28 @@ const en: LocaleType = {
     Success: "Copied to clipboard",
     Failed: "Copy failed, please grant permission to access clipboard",
   },
+  Download: {
+    Success: "Content downloaded to your directory.",
+    Failed: "Download failed.",
+  },
   Context: {
     Toast: (x: any) => `With ${x} contextual prompts`,
-    Edit: "Contextual and Memory Prompts",
+    Edit: "Current Chat Settings",
     Add: "Add a Prompt",
     Clear: "Context Cleared",
     Revert: "Revert",
   },
+  Shop: {
+    Name: "Subscribe",
+  },
+  User: {
+    Name: "Profile",
+  },
   Plugin: {
     Name: "Plugin",
+  },
+  FineTuned: {
+    Sysmessage: "You are an assistant that",
   },
   Mask: {
     Name: "Mask",
@@ -494,6 +748,10 @@ const en: LocaleType = {
     Config: {
       Avatar: "Bot Avatar",
       Name: "Bot Name",
+      Description: {
+        title: "Bot Description",
+        SubTitle: "",
+      },
       Sync: {
         Title: "Use Global Config",
         SubTitle: "Use global config in this chat",
@@ -502,6 +760,11 @@ const en: LocaleType = {
       HideContext: {
         Title: "Hide Context Prompts",
         SubTitle: "Do not show in-context prompts in chat",
+      },
+      Share: {
+        Title: "Share This Mask",
+        SubTitle: "Generate a link to this mask",
+        Action: "Copy Link",
       },
     },
   },
@@ -521,12 +784,21 @@ const en: LocaleType = {
     Close: "Close",
     Create: "Create",
     Edit: "Edit",
+    Export: "Export",
+    Import: "Import",
+    Sync: "Sync",
+    Config: "Config",
   },
   Exporter: {
     Model: "Model",
     Messages: "Messages",
     Topic: "Topic",
     Time: "Time",
+  },
+
+  URLCommand: {
+    Code: "Detected access code from url, confirm to apply? ",
+    Settings: "Detected settings from url, confirm to apply?",
   },
 };
 

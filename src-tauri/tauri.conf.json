@@ -9,7 +9,7 @@
   },
   "package": {
     "productName": "AIChatWeb App",
-    "version": "0.5.0"
+    "version": "0.11.0"
   },
   "tauri": {
     "allowlist": {
@@ -17,6 +17,11 @@
       "shell": {
         "all": false,
         "open": true
+      },
+      "http": {
+        "all": true,
+        "request": true,
+        "scope":["http://**", "https://**"]
       },
       "dialog": {
         "all": true,
@@ -44,6 +49,12 @@
         "startDragging": true,
         "unmaximize": true,
         "unminimize": true
+      },
+      "fs": {
+        "all": true
+      },
+      "notification": {
+        "all": true
       }
     },
     "bundle": {
@@ -91,7 +102,7 @@
       "windows": {
         "installMode": "passive"
       },
-      "pubkey": "to-do"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQ4RjEzQjVCQ0YxMDFFNjQKUldSa0hoRFBXenZ4MkJiaHg0eWFlN3VOWlNZaTRENFhGdmlkS0h1Uk5KeWwwVnlwdFdMMll0MnUK"
     },
     "windows": [
       {

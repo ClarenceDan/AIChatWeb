@@ -5,7 +5,7 @@ const es: PartialLocaleType = {
   WIP: "En construcción...",
   Error: {
     Unauthorized:
-      "Acceso no autorizado, por favor ingrese el código de acceso en la página de configuración.",
+      "Acceso no autorizado, por favor ingrese el código de acceso en la [página](/#/auth) de configuración.",
   },
   Sidebar: {
     Title: "公告",
@@ -178,6 +178,10 @@ const es: PartialLocaleType = {
       Pricing: "购买套餐",
       GoToBalanceList: "更多",
       ConsultAdministrator: "请咨询站长",
+      All: "所有套餐",
+      CreateInviteCode: "生成邀请码",
+      Copy: "复制链接",
+      Redeem: "兑换码",
     },
     BalanceItem: {
       Title: "套餐类型",
@@ -192,6 +196,17 @@ const es: PartialLocaleType = {
     ExpireList: {
       Title: "过期时间",
       SubTitle: "",
+    },
+  },
+  RedeemCodePage: {
+    Title: "兑换码",
+    RedeemCodeInput: {
+      Title: "兑换码",
+      Placeholder: "请输入兑换码",
+    },
+    Actions: {
+      Close: "关闭",
+      Redeem: "开始兑换",
     },
   },
   PricingPage: {
@@ -217,6 +232,11 @@ const es: PartialLocaleType = {
       Title: "Tamaño de fuente",
       SubTitle: "Ajustar el tamaño de fuente del contenido del chat",
     },
+    InjectSystemPrompts: {
+      Title: "Inyectar Prompts del Sistema",
+      SubTitle:
+        "Agregar forzosamente un prompt de sistema simulado de ChatGPT al comienzo de la lista de mensajes en cada solicitud",
+    },
     Update: {
       Version: (x: string) => `Versión: ${x}`,
       IsLatest: "Última versión",
@@ -233,8 +253,10 @@ const es: PartialLocaleType = {
       SubTitle: "Preview markdown in bubble",
     },
     Mask: {
-      Title: "Mask Splash Screen",
-      SubTitle: "Show a mask splash screen before starting new chat",
+      Splash: {
+        Title: "Mask Splash Screen",
+        SubTitle: "Show a mask splash screen before starting new chat",
+      },
     },
     Prompt: {
       Disable: {
@@ -263,11 +285,7 @@ const es: PartialLocaleType = {
       SubTitle:
         "Se comprimirán los mensajes si la longitud de los mensajes no comprimidos supera el valor",
     },
-    Token: {
-      Title: "Clave de API",
-      SubTitle: "Utiliza tu clave para ignorar el límite de código de acceso",
-      Placeholder: "Clave de la API de OpenAI",
-    },
+
     Usage: {
       Title: "Saldo de la cuenta",
       SubTitle(used: any, total: any) {
@@ -277,11 +295,7 @@ const es: PartialLocaleType = {
       Check: "Comprobar de nuevo",
       NoAccess: "Introduzca la clave API para comprobar el saldo",
     },
-    AccessCode: {
-      Title: "Código de acceso",
-      SubTitle: "Control de acceso habilitado",
-      Placeholder: "Necesita código de acceso",
-    },
+
     Model: "Modelo",
     Temperature: {
       Title: "Temperatura",
@@ -328,6 +342,9 @@ const es: PartialLocaleType = {
   },
   Plugin: {
     Name: "Plugin",
+  },
+  FineTuned: {
+    Sysmessage: "Eres un asistente que",
   },
   Mask: {
     Name: "Mask",

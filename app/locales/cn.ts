@@ -1,4 +1,7 @@
+import { getClientConfig } from "../config/client";
 import { SubmitKey } from "../store/config";
+
+const isApp = !!getClientConfig()?.isApp;
 
 const cn = {
   WIP: "该功能仍在开发中……",
@@ -9,6 +12,7 @@ const cn = {
   Auth: {
     Title: "需要密码",
     Tips: "管理员开启了密码验证，请在下方填入访问码",
+    SubTips: "或者输入你的 OpenAI API 密钥",
     Input: "在此处填写访问码",
     Confirm: "确认",
     Later: "稍后再说",
@@ -22,22 +26,29 @@ const cn = {
   },
   Chat: {
     SubTitle: (count: number) => `共 ${count} 条对话`,
+    EditMessage: {
+      Title: "编辑消息记录",
+      Topic: {
+        Title: "聊天主题",
+        SubTitle: "更改当前聊天主题",
+      },
+    },
     Actions: {
       ChatList: "查看消息列表",
       CompressedHistory: "查看压缩后的历史 Prompt",
-      Export: "导出聊天记录",
+      Export: "分享本页",
       Copy: "复制",
       Stop: "停止",
       Retry: "重试",
       Pin: "固定",
-      PinToastContent: "已将 2 条对话固定至预设提示词",
+      PinToastContent: "已将 1 条对话固定至预设提示词",
       PinToastAction: "查看",
       Delete: "删除",
       Edit: "编辑",
     },
     Commands: {
       new: "新建聊天",
-      newm: "从面具新建聊天",
+      newm: "选择应用新建聊天",
       next: "下一个聊天",
       prev: "上一个聊天",
       clear: "清除上下文",
@@ -52,11 +63,12 @@ const cn = {
         dark: "深色模式",
       },
       Prompt: "快捷指令",
-      Masks: "所有面具",
+      Masks: "所有应用",
       Clear: "清除聊天",
       Settings: "对话设置",
       Internet: "联网模式",
     },
+    TooFrequently: "您发送太快啦，请稍后重试",
     Rename: "重命名对话",
     Typing: "正在输入…",
     SensitiveWordsTip: (question: string) =>
@@ -73,21 +85,27 @@ const cn = {
     Draw: "绘画",
     Config: {
       Reset: "清除记忆",
-      SaveAs: "存为面具",
+      SaveAs: "存为应用",
+      Confirm: "确定",
     },
+    IsContext: "预设提示词",
   },
   Midjourney: {
+    Uploading: "上传中……",
     SelectImgMax: (max: number) => `最多可选择 ${max} 张图片`,
     InputDisabled: "该模式下不支持输入内容",
+    NotSupports: "暂不支持此操作",
     HasImgTip:
       "提示：垫图模式/识图(describe)模式只会使用第一张图片，混图(blend)模式会按顺序使用选中的5张图片（点击图片可以移除）",
     ModeImagineUseImg: "垫图（图生图）模式",
     ModeBlend: "混图模式",
     ModeDescribe: "识图（图生文）模式",
-    NeedInputUseImgPrompt:
-      "垫图模式下需要输入内容才能使用图片，请以“/mj”开头输入内容",
+    NeedInputUseImgPrompt: "垫图模式下需要输入内容才能使用图片，请输入内容",
+    ImagineMaxImg: (max: number) => `垫图（图生图）模式下至多 ${max} 张图片`,
+    gpt4vMaxImg: (max: number) => `该模式下至多 ${max} 张图片`,
     BlendMinImg: (min: number, max: number) =>
       `混图模式下至少需要 ${min} 张图片，至多 ${max} 张图片`,
+    DescribeMaxImg: (max: number) => `识图（图生文）模式下至多 ${max} 张图片`,
     TaskErrUnknownType: "任务提交失败：未知的任务类型",
     TaskErrNotSupportType: (type: string) =>
       `任务提交失败：不支持的任务类型 -> ${type}`,
@@ -105,8 +123,9 @@ const cn = {
     TaskStatus: "任务状态",
     TaskRemoteSubmit: "任务已提交至绘图服务器",
     TaskProgressTip: (progress: number | undefined) =>
-      `任务正在运行${progress ? `，当前进度：${progress}` : ""}`,
-    TaskNotStart: "任务尚未开始",
+      `正在绘制${progress ? `，当前进度：${progress}%` : ""}`,
+    TaskNotStart: "等待调度",
+    Refresh: "获取最新进度",
     Url: "地址",
     SettingProxyCoverTip:
       "在此处定义的MidjourneyProxy地址会覆盖环境变量中的MIDJOURNEY_PROXY_URL",
@@ -126,12 +145,16 @@ const cn = {
       SubTitle: "可以导出 Markdown 文本或者 PNG 图片",
     },
     IncludeContext: {
-      Title: "包含面具上下文",
-      SubTitle: "是否在消息中展示面具上下文",
+      Title: "包含应用上下文",
+      SubTitle: "是否在消息中展示应用上下文",
     },
     Steps: {
       Select: "选取",
       Preview: "预览",
+    },
+    Image: {
+      Toast: "正在生成截图",
+      Modal: "长按或右键保存图片",
     },
   },
   Select: {
@@ -147,6 +170,7 @@ const cn = {
     Copy: "复制摘要",
     Reset: "[unused]",
     ResetConfirm: "确认清空历史摘要？",
+    CloseConfirm: "您已修改部分配置项，确定不保存直接退出？",
   },
   Home: {
     NewChat: "新的聊天",
@@ -200,9 +224,19 @@ const cn = {
       SubTitle: "系统将向您邮箱发送的验证码",
       Placeholder: "请输入验证码",
     },
+    Phone: {
+      Title: "手机号",
+      SubTitle: "",
+      Placeholder: "请输入手机号",
+    },
+    PhoneCode: {
+      Title: "验证码",
+      SubTitle: "系统将向您手机号发送的短信验证码",
+      Placeholder: "请输入短信验证码",
+    },
     Username: {
       Title: "用户名",
-      SubTitle: "",
+      SubTitle: "用户名只能包含字母、数字、下划线，不可以包含中文",
       Placeholder: "请输入用户名",
     },
     Password: {
@@ -233,6 +267,14 @@ const cn = {
       EmailFormatError: "邮箱格式不正确",
       EmailCodeEmpty: "请输入邮箱验证码",
       EmailExistsError: "该邮箱已注册",
+      SendPhoneCode: "发送短信验证码",
+      PhoneCodeSending: "验证码发送中",
+      PhoneCodeSent: "验证码已发送，请查看短信",
+      PhoneIsEmpty: "请输入手机号",
+      PhoneCodeSentFrequently: "验证码发送过于频繁，请稍后再试",
+      PhoneFormatError: "手机号格式不正确",
+      PhoneCodeEmpty: "请输入短信验证码",
+      PhoneExistsError: "该手机号已注册",
     },
     GoToLogin: "前往登录",
     Captcha: "",
@@ -263,27 +305,42 @@ const cn = {
     SubTitle: "个人中心",
     Username: "账号",
     Email: "邮箱",
+    Phone: "手机号",
+    Invitor: {
+      Title: "邀请人",
+    },
+    InviteCode: {
+      Title: "邀请码(选填)",
+      TitleRequired: "邀请码(必填)",
+      Placeholder: "输入邀请码获得额外权益",
+    },
     Tokens: {
       Title: "tokens",
-      SubTitle: "剩余tokens数量",
+      SubTitle: "",
     },
     ChatCount: {
-      Title: "询问次数",
-      SubTitle: "剩余询问次数（GPT3.5等）",
+      Title: "基础聊天积分",
+      SubTitle: "",
     },
     AdvanceChatCount: {
-      Title: "询问次数（GPT4）",
-      SubTitle: "聊天询问次数（GPT4）",
+      Title: "高级聊天积分",
+      SubTitle: "",
     },
     DrawCount: {
-      Title: "绘图次数",
-      SubTitle: "剩余绘图次数",
+      Title: "绘图积分",
+      SubTitle: "",
     },
     Actions: {
       Close: "关闭",
       Pricing: "购买套餐",
+      Order: "订单中心",
+      BalanceLog: "额度变动记录",
       GoToBalanceList: "更多",
       ConsultAdministrator: "请咨询站长",
+      All: "所有套餐",
+      CreateInviteCode: "生成邀请码",
+      Copy: "复制链接",
+      Redeem: "兑换码",
     },
     BalanceItem: {
       Title: "套餐类型",
@@ -296,8 +353,19 @@ const cn = {
       },
     },
     ExpireList: {
-      Title: "过期时间",
+      Title: "到期时间",
       SubTitle: "",
+    },
+  },
+  RedeemCodePage: {
+    Title: "兑换码",
+    RedeemCodeInput: {
+      Title: "兑换码",
+      Placeholder: "请输入兑换码",
+    },
+    Actions: {
+      Close: "关闭",
+      Redeem: "开始兑换",
     },
   },
   PricingPage: {
@@ -306,11 +374,81 @@ const cn = {
     Actions: {
       Close: "关闭",
       Buy: " 购 买 ",
+      Order: "订单中心",
+      RedeemCode: "兑换码",
     },
     NoPackage: "暂无可用套餐",
-    Loading: "套餐加载中……",
+    Loading: "请稍候……",
     PleaseLogin: "请先登录",
     ConsultAdministrator: "请咨询站长",
+    BuyFailedCause: "套餐购买失败！原因：",
+    TOO_FREQUENCILY: "操作过于频繁，请稍后再试",
+    CREATE_ORDER_FAILED: "创建订单失败",
+  },
+  PayPage: {
+    PaidSuccess: "支付成功",
+    Actions: {
+      Close: "关闭",
+    },
+  },
+  BalancePage: {
+    Title: "已购套餐",
+    NoBalance: "您尚未购买任何套餐",
+    Loading: "请稍候……",
+    Actions: {
+      Close: "关闭",
+      Pricing: "购买套餐",
+      Order: "订单中心",
+      Profile: "个人中心",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+      RedeemCode: "兑换码",
+      BalanceLog: "额度变动记录",
+    },
+  },
+  InvitationPage: {
+    Title: "邀请记录",
+    NoInvitation: "快将邀请链接分享给朋友吧",
+    Loading: "请稍候……",
+    Actions: {
+      Close: "关闭",
+      Profile: "个人中心",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+    },
+  },
+  BalanceLogPage: {
+    Title: "额度变动记录",
+    NoBalance: "暂无记录",
+    Loading: "请稍候……",
+    Actions: {
+      Close: "关闭",
+      Profile: "个人中心",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+      Balance: "所有套餐",
+    },
+  },
+  OrderPage: {
+    Title: "订单中心",
+    NoOrder: "暂无订单",
+    Loading: "请稍候……",
+    StateError: "状态错误！",
+    CancelFailedForStateError: "当前状态下无法取消",
+    CancelSuccess: "订单取消成功",
+    CancelFailure: "订单取消失败",
+    TryAgainLaster: "操作失败，请稍候重试",
+    PleaseWaitForDataSync:
+      "数据可能延迟，支付成功请在10分钟后查看订单状态，请勿重复支付",
+    Actions: {
+      Pay: "支付",
+      Cancel: "取消",
+      Pricing: "购买套餐",
+      Profile: "个人中心",
+      Copy: "复制",
+      Refresh: "刷新",
+      Refreshing: "刷新中……",
+    },
   },
   Settings: {
     Title: "设置",
@@ -339,7 +477,10 @@ const cn = {
       Title: "字体大小",
       SubTitle: "聊天内容的字体大小",
     },
-
+    InjectSystemPrompts: {
+      Title: "注入系统级提示信息",
+      SubTitle: "强制给每次请求的消息列表开头添加一个模拟 ChatGPT 的系统提示",
+    },
     InputTemplate: {
       Title: "用户输入预处理",
       SubTitle: "用户最新的一条消息会填充到此模板",
@@ -360,9 +501,62 @@ const cn = {
       Title: "预览气泡",
       SubTitle: "在预览气泡中预览 Markdown 内容",
     },
+    AutoGenerateTitle: {
+      Title: "自动生成标题",
+      SubTitle: "根据对话内容生成合适的标题",
+    },
+    Sync: {
+      CloudState: "云端数据",
+      NotSyncYet: "还没有进行过同步",
+      Success: "同步成功",
+      Fail: "同步失败",
+
+      Config: {
+        Modal: {
+          Title: "配置云同步",
+          Check: "检查可用性",
+        },
+        SyncType: {
+          Title: "同步类型",
+          SubTitle: "选择喜爱的同步服务器",
+        },
+        Proxy: {
+          Title: "启用代理",
+          SubTitle: "在浏览器中同步时，必须启用代理以避免跨域限制",
+        },
+        ProxyUrl: {
+          Title: "代理地址",
+          SubTitle: "仅适用于本项目自带的跨域代理",
+        },
+
+        WebDav: {
+          Endpoint: "WebDAV 地址",
+          UserName: "用户名",
+          Password: "密码",
+        },
+
+        UpStash: {
+          Endpoint: "UpStash Redis REST Url",
+          UserName: "备份名称",
+          Password: "UpStash Redis REST Token",
+        },
+      },
+
+      LocalState: "本地数据",
+      Overview: (overview: any) => {
+        return `${overview.chat} 次对话，${overview.message} 条消息，${overview.prompt} 条提示词，${overview.mask} 个面具`;
+      },
+      ImportFailed: "导入失败",
+    },
     Mask: {
-      Title: "面具启动页",
-      SubTitle: "新建聊天时，展示面具启动页",
+      Splash: {
+        Title: "应用启动页",
+        SubTitle: "新建聊天时，展示应用启动页",
+      },
+      Builtin: {
+        Title: "隐藏内置应用",
+        SubTitle: "在所有面具列表中隐藏内置应用",
+      },
     },
     Prompt: {
       Disable: {
@@ -390,11 +584,6 @@ const cn = {
       Title: "历史消息长度压缩阈值",
       SubTitle: "当未压缩的历史消息超过该值时，将进行压缩",
     },
-    Token: {
-      Title: "API Key",
-      SubTitle: "使用自己的 Key 可绕过密码访问限制",
-      Placeholder: "OpenAI API Key",
-    },
 
     Usage: {
       Title: "余额查询",
@@ -405,19 +594,64 @@ const cn = {
       Check: "重新检查",
       NoAccess: "输入 API Key 或访问密码查看余额",
     },
-    AccessCode: {
-      Title: "访问密码",
-      SubTitle: "管理员已开启加密访问",
-      Placeholder: "请输入访问密码",
+
+    Access: {
+      AccessCode: {
+        Title: "访问密码",
+        SubTitle: "管理员已开启加密访问",
+        Placeholder: "请输入访问密码",
+      },
+      CustomEndpoint: {
+        Title: "自定义接口",
+        SubTitle: "是否使用自定义 Azure 或 OpenAI 服务",
+      },
+      Provider: {
+        Title: "模型服务商",
+        SubTitle: "切换不同的服务商",
+      },
+      OpenAI: {
+        ApiKey: {
+          Title: "API Key",
+          SubTitle: "使用自定义 OpenAI Key 绕过密码访问限制",
+          Placeholder: "OpenAI API Key",
+        },
+
+        Endpoint: {
+          Title: "接口地址",
+          SubTitle: "除默认地址外，必须包含 http(s)://",
+        },
+      },
+      Azure: {
+        ApiKey: {
+          Title: "接口密钥",
+          SubTitle: "使用自定义 Azure Key 绕过密码访问限制",
+          Placeholder: "Azure API Key",
+        },
+
+        Endpoint: {
+          Title: "接口地址",
+          SubTitle: "样例：",
+        },
+
+        ApiVerion: {
+          Title: "接口版本 (azure api version)",
+          SubTitle: "选择指定的部分版本",
+        },
+      },
+      CustomModel: {
+        Title: "自定义模型名",
+        SubTitle: "增加自定义模型可选项，使用英文逗号隔开",
+      },
     },
-    Endpoint: {
-      Title: "接口地址",
-      SubTitle: "除默认地址外，必须包含 http(s)://",
-    },
+
     Model: "模型 (model)",
     Temperature: {
       Title: "随机性 (temperature)",
       SubTitle: "值越大，回复越随机",
+    },
+    TopP: {
+      Title: "核采样 (top_p)",
+      SubTitle: "与随机性类似，但不要和随机性一起更改",
     },
     MaxTokens: {
       Title: "单次回复限制 (max_tokens)",
@@ -443,7 +677,7 @@ const cn = {
     Prompt: {
       History: (content: string) => "这是历史聊天总结作为前情提要：" + content,
       Topic:
-        "使用四到五个字直接返回这句话的简要主题，不要解释、不要标点、不要语气词、不要多余文本，如果没有主题，请直接返回“闲聊”",
+        "使用四到五个字直接返回这句话的简要主题，不要解释、不要标点、不要换行、不要语气词、不要多余文本，如果没有主题，请直接返回“闲聊”",
       Summarize:
         "简要总结一下对话内容，用作后续的上下文提示 prompt，控制在 200 字以内",
     },
@@ -452,22 +686,35 @@ const cn = {
     Success: "已写入剪切板",
     Failed: "复制失败，请赋予剪切板权限",
   },
+  Download: {
+    Success: "内容已下载到您的目录。",
+    Failed: "下载失败。",
+  },
   Context: {
     Toast: (x: any) => `包含 ${x} 条预设提示词`,
     Edit: "当前对话设置",
-    Add: "新增预设对话",
+    Add: "新增一条对话",
     Clear: "上下文已清除",
     Revert: "恢复上下文",
   },
+  Shop: {
+    Name: "服务订阅",
+  },
+  User: {
+    Name: "个人中心",
+  },
   Plugin: {
-    Name: "插件",
+    Name: "插件管理",
+  },
+  FineTuned: {
+    Sysmessage: "你是一个助手",
   },
   Mask: {
-    Name: "面具",
+    Name: "高级应用",
     Page: {
-      Title: "预设角色面具",
-      SubTitle: (count: number) => `${count} 个预设角色定义`,
-      Search: "搜索角色面具",
+      Title: "应用中心",
+      SubTitle: (count: number) => `${count} 个应用定义`,
+      Search: "搜索应用",
       Create: "新建",
     },
     Item: {
@@ -480,13 +727,17 @@ const cn = {
     },
     EditModal: {
       Title: (readonly: boolean) =>
-        `编辑预设面具 ${readonly ? "（只读）" : ""}`,
+        `编辑预设应用 ${readonly ? "（只读）" : ""}`,
       Download: "下载预设",
       Clone: "克隆预设",
     },
     Config: {
       Avatar: "角色头像",
       Name: "角色名称",
+      Description: {
+        title: "角色描述",
+        SubTitle: "仅限后台应用支持编辑",
+      },
       Sync: {
         Title: "使用全局设置",
         SubTitle: "当前对话是否使用全局模型设置",
@@ -496,6 +747,11 @@ const cn = {
         Title: "隐藏预设对话",
         SubTitle: "隐藏后预设对话不会出现在聊天界面",
       },
+      Share: {
+        Title: "分享此面具",
+        SubTitle: "生成此面具的直达链接",
+        Action: "复制链接",
+      },
     },
   },
   NewChat: {
@@ -503,9 +759,14 @@ const cn = {
     Skip: "直接开始",
     NotShow: "不再展示",
     ConfirmNoShow: "确认禁用？禁用后可以随时在设置中重新启用。",
-    Title: "挑选一个面具",
-    SubTitle: "现在开始，与面具背后的灵魂思维碰撞",
+    Title: "选择一个应用",
+    SubTitle: "现在开始，使用人工智能的高级方法",
     More: "查看全部",
+  },
+
+  URLCommand: {
+    Code: "检测到链接中已经包含访问码，是否自动填入？",
+    Settings: "检测到链接中包含了预制设置，是否自动填入？",
   },
 
   UI: {
@@ -514,6 +775,10 @@ const cn = {
     Close: "关闭",
     Create: "新建",
     Edit: "编辑",
+    Export: "导出",
+    Import: "导入",
+    Sync: "同步",
+    Config: "配置",
   },
   Exporter: {
     Model: "模型",

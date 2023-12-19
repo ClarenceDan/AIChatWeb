@@ -14,6 +14,7 @@
   --hover-color: #f3f3f3;
   --bar-color: rgba(0, 0, 0, 0.1);
   --theme-color: var(--gray);
+  --disabled: #ccc;
 
   /* shadow */
   --shadow: 50px 50px 100px 10px rgb(0, 0, 0, 0.1);
@@ -40,6 +41,7 @@
   --border-in-light: 1px solid rgba(255, 255, 255, 0.192);
 
   --theme-color: var(--gray);
+  --disabled: #666;
 
   div:not(.no-dark) > svg {
     filter: invert(0.5);
@@ -88,10 +90,16 @@
     @include dark;
   }
 }
+
+.separator-page {
+  --sidebar-width: 0;
+  --window-content-width: calc(100% - var(--sidebar-width));
+}
+
 html {
   height: var(--full-height);
 
-  font-family: "Noto Sans SC", "SF Pro SC", "SF Pro Text", "SF Pro Icons",
+  font-family: "Noto Sans", "SF Pro SC", "SF Pro Text", "SF Pro Icons",
     "PingFang SC", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
 
@@ -101,12 +109,20 @@ body {
   margin: 0;
   padding: 0;
   height: var(--full-height);
+  position: relative;
+}
+
+.body {
+  margin: 0;
+  padding: 0;
+  height: var(--full-height);
   width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
   user-select: none;
   touch-action: pan-x pan-y;
+  overflow: hidden;
 
   @media only screen and (max-width: 600px) {
     background-color: var(--second);
@@ -354,11 +370,15 @@ pre {
   justify-content: center;
   border: var(--border-in-light);
   box-shadow: var(--card-shadow);
-  border-radius: 10px;
+  border-radius: 11px;
 }
 
 .one-line {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.copyable {
+  user-select: text;
 }

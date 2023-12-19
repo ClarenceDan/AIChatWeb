@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 
 import styles from "./home.module.scss";
 
@@ -12,18 +12,23 @@ import NoticeIcon from "../icons/notice.svg";
 import ChatBotIcon from "../icons/ai-chat-bot.png";
 import AddIcon from "../icons/add.svg";
 import CloseIcon from "../icons/close.svg";
-import MaskIcon from "../icons/mask.svg";
+import DeleteIcon from "../icons/delete.svg";
+import MaskIcon from "../icons/app.svg";
 import PluginIcon from "../icons/plugin.svg";
+import DragIcon from "../icons/drag.svg";
 import NextImage from "next/image";
+import UserIcon from "../icons/user.svg";
+import CartIcon from "../icons/cart-outline.svg";
 
 import Locale from "../locales";
 
 import { Modal } from "./ui-lib";
 
-import { useAppConfig, useChatStore } from "../store";
+import { useAppConfig, useAuthStore, useChatStore } from "../store";
 import { useWebsiteConfigStore, useNoticeConfigStore } from "../store";
 
 import {
+  DEFAULT_SIDEBAR_WIDTH,
   MAX_SIDEBAR_WIDTH,
   MIN_SIDEBAR_WIDTH,
   NARROW_SIDEBAR_WIDTH,
@@ -32,7 +37,7 @@ import {
 } from "../constant";
 
 import { Link, useNavigate } from "react-router-dom";
-import { useMobileScreen } from "../utils";
+import { isIOS, useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
 import { showConfirm, showToast } from "./ui-lib";
 
@@ -64,31 +69,57 @@ function useDragSideBar() {
 
   const config = useAppConfig();
   const startX = useRef(0);
-  const startDragWidth = useRef(config.sidebarWidth ?? 300);
+  const startDragWidth = useRef(config.sidebarWidth ?? DEFAULT_SIDEBAR_WIDTH);
   const lastUpdateTime = useRef(Date.now());
 
-  const handleMouseMove = useRef((e: MouseEvent) => {
-    if (Date.now() < lastUpdateTime.current + 50) {
-      return;
-    }
-    lastUpdateTime.current = Date.now();
-    const d = e.clientX - startX.current;
-    const nextWidth = limit(startDragWidth.current + d);
-    config.update((config) => (config.sidebarWidth = nextWidth));
-  });
-
-  const handleMouseUp = useRef(() => {
-    startDragWidth.current = config.sidebarWidth ?? 300;
-    window.removeEventListener("mousemove", handleMouseMove.current);
-    window.removeEventListener("mouseup", handleMouseUp.current);
-  });
-
-  const onDragMouseDown = (e: MouseEvent) => {
-    startX.current = e.clientX;
-
-    window.addEventListener("mousemove", handleMouseMove.current);
-    window.addEventListener("mouseup", handleMouseUp.current);
+  const toggleSideBar = () => {
+    config.update((config) => {
+      if (config.sidebarWidth < MIN_SIDEBAR_WIDTH) {
+        config.sidebarWidth = DEFAULT_SIDEBAR_WIDTH;
+      } else {
+        config.sidebarWidth = NARROW_SIDEBAR_WIDTH;
+      }
+    });
   };
+
+  const onDragStart = (e: MouseEvent) => {
+    // Remembers the initial width each time the mouse is pressed
+    startX.current = e.clientX;
+    startDragWidth.current = config.sidebarWidth;
+    const dragStartTime = Date.now();
+
+    const handleDragMove = (e: MouseEvent) => {
+      if (Date.now() < lastUpdateTime.current + 20) {
+        return;
+      }
+      lastUpdateTime.current = Date.now();
+      const d = e.clientX - startX.current;
+      const nextWidth = limit(startDragWidth.current + d);
+      config.update((config) => {
+        if (nextWidth < MIN_SIDEBAR_WIDTH) {
+          config.sidebarWidth = NARROW_SIDEBAR_WIDTH;
+        } else {
+          config.sidebarWidth = nextWidth;
+        }
+      });
+    };
+
+    const handleDragEnd = () => {
+      // In useRef the data is non-responsive, so `config.sidebarWidth` can't get the dynamic sidebarWidth
+      window.removeEventListener("pointermove", handleDragMove);
+      window.removeEventListener("pointerup", handleDragEnd);
+
+      // if user click the drag icon, should toggle the sidebar
+      const shouldFireClick = Date.now() - dragStartTime < 300;
+      if (shouldFireClick) {
+        toggleSideBar();
+      }
+    };
+
+    window.addEventListener("pointermove", handleDragMove);
+    window.addEventListener("pointerup", handleDragEnd);
+  };
+
   const isMobileScreen = useMobileScreen();
   const shouldNarrow =
     !isMobileScreen && config.sidebarWidth < MIN_SIDEBAR_WIDTH;
@@ -96,56 +127,97 @@ function useDragSideBar() {
   useEffect(() => {
     const barWidth = shouldNarrow
       ? NARROW_SIDEBAR_WIDTH
-      : limit(config.sidebarWidth ?? 300);
+      : limit(config.sidebarWidth ?? DEFAULT_SIDEBAR_WIDTH);
     const sideBarWidth = isMobileScreen ? "100vw" : `${barWidth}px`;
     document.documentElement.style.setProperty("--sidebar-width", sideBarWidth);
   }, [config.sidebarWidth, isMobileScreen, shouldNarrow]);
 
   return {
-    onDragMouseDown,
+    onDragStart,
     shouldNarrow,
   };
 }
 
+export const NoticeModelBody = React.memo(
+  (props: { title: string; content: string }) => {
+    return (
+      <div>
+        <div
+          style={{
+            textAlign: "center",
+            fontSize: "20px",
+            lineHeight: "40px",
+            marginBottom: "10px",
+          }}
+          dangerouslySetInnerHTML={{ __html: props.title || "" }}
+        ></div>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: props.content || "",
+          }}
+        ></div>
+      </div>
+    );
+  },
+);
+NoticeModelBody.displayName = "NoticeModelBody";
+
+function sameDate(d1: Date, d2: Date) {
+  if (d1.constructor.name === "String") {
+    d1 = new Date(d1);
+  }
+  return (
+    d1.getDate() === d2.getDate() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getFullYear() === d2.getFullYear()
+  );
+}
 export function NoticeModel(props: {
   title: string;
   content: string;
-  onClose: () => void;
+  noticeNotShowToday: Date | null;
+  onClose: (notShowToday: boolean) => void;
 }) {
-  const noticeConfigStore = useNoticeConfigStore();
+  const init =
+    props.noticeNotShowToday === null
+      ? false
+      : sameDate(props.noticeNotShowToday, new Date());
+  const [notShowToday, setNotShowToday] = useState(init);
 
   return (
     <div className="modal-mask">
       <Modal
         title={Locale.Sidebar.Title}
-        onClose={() => props.onClose()}
+        onClose={() => props.onClose(notShowToday)}
         actions={[
           <IconButton
             key="reset"
             bordered
             text={Locale.Sidebar.Close}
             onClick={() => {
-              props.onClose();
+              props.onClose(notShowToday);
             }}
           />,
         ]}
-      >
-        <div>
+        footer={
           <div
             style={{
-              textAlign: "center",
-              fontSize: "20px",
-              lineHeight: "40px",
-              marginBottom: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: "20px",
             }}
-            dangerouslySetInnerHTML={{ __html: props.title || "" }}
-          ></div>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: props.content || "",
-            }}
-          ></div>
-        </div>
+          >
+            <input
+              type="checkbox"
+              checked={notShowToday}
+              onChange={() => setNotShowToday(!notShowToday)}
+            />
+            今日不再弹出
+          </div>
+        }
+      >
+        <NoticeModelBody title={props.title} content={props.content} />
       </Modal>
     </div>
   );
@@ -156,31 +228,48 @@ export function SideBar(props: {
   noticeShow: boolean;
   noticeTitle: string;
   noticeContent: string;
-  setNoticeShow: (show: boolean) => void;
+  noticeNotShowToday: Date | null;
+  showNotice: () => void;
+  setNoticeShow: (show: boolean, notShowToday: boolean) => void;
+  logoLoading: boolean;
+  logoUrl?: string;
 }) {
   const chatStore = useChatStore();
+  const authStore = useAuthStore();
 
   // drag side bar
-  const { onDragMouseDown, shouldNarrow } = useDragSideBar();
+  const { onDragStart, shouldNarrow } = useDragSideBar();
   const navigate = useNavigate();
   const config = useAppConfig();
+  const isMobileScreen = useMobileScreen();
+  const isIOSMobile = useMemo(
+    () => isIOS() && isMobileScreen,
+    [isMobileScreen],
+  );
 
   useHotKey();
 
   const websiteConfigStore = useWebsiteConfigStore();
   const noticeConfigStore = useNoticeConfigStore();
 
+  const logoLoading = props.logoLoading;
+  const logoUrl = props.logoUrl;
+
   return (
     <div
       className={`${styles.sidebar} ${props.className} ${
         shouldNarrow && styles["narrow-sidebar"]
       }`}
+      style={{
+        // #3016 disable transition on ios mobile screen
+        transition: isMobileScreen && isIOSMobile ? "none" : undefined,
+      }}
     >
       <div className={styles["sidebar-header"]} data-tauri-drag-region>
         <div
           className={styles["sidebar-title"]}
           dangerouslySetInnerHTML={{
-            __html: websiteConfigStore.mainTitle || "AI Chat",
+            __html: websiteConfigStore.mainTitle || "AIChat Next Web",
           }}
           data-tauri-drag-region
         ></div>
@@ -192,23 +281,29 @@ export function SideBar(props: {
           }}
         ></div>
         <div className={styles["sidebar-logo"] + " no-dark"}>
-          <NextImage src={ChatBotIcon.src} width={44} height={44} alt="bot" />
+          {logoLoading ? (
+            <></>
+          ) : !logoUrl ? (
+            <NextImage src={ChatBotIcon.src} width={44} height={44} alt="bot" />
+          ) : (
+            <img src={logoUrl} width={44} height={44} />
+          )}
         </div>
       </div>
 
       <div className={styles["sidebar-header-bar"]}>
         <IconButton
-          icon={<MaskIcon />}
-          text={shouldNarrow ? undefined : Locale.Mask.Name}
+          icon={<UserIcon />}
+          text={shouldNarrow ? undefined : Locale.User.Name}
           className={styles["sidebar-bar-button"]}
-          onClick={() => navigate(Path.NewChat, { state: { fromHome: true } })}
+          onClick={() => navigate(Path.Profile)}
           shadow
         />
         <IconButton
-          icon={<PluginIcon />}
-          text={shouldNarrow ? undefined : Locale.Plugin.Name}
+          icon={<CartIcon />}
+          text={shouldNarrow ? undefined : Locale.Shop.Name}
           className={styles["sidebar-bar-button"]}
-          onClick={() => showToast(Locale.WIP)}
+          onClick={() => navigate(Path.Pricing)}
           shadow
         />
       </div>
@@ -228,10 +323,17 @@ export function SideBar(props: {
         <div className={styles["sidebar-actions"]}>
           <div className={styles["sidebar-action"] + " " + styles.mobile}>
             <IconButton
-              icon={<CloseIcon />}
+              icon={<DeleteIcon />}
               onClick={async () => {
                 if (await showConfirm(Locale.Home.DeleteChat)) {
-                  chatStore.deleteSession(chatStore.currentSessionIndex);
+                  chatStore.deleteSession(
+                    chatStore.currentSessionIndex,
+                    authStore.token,
+                    () => {
+                      authStore.logout();
+                      navigate(Path.Login);
+                    },
+                  );
                 }
               }}
             />
@@ -246,7 +348,7 @@ export function SideBar(props: {
               <IconButton
                 icon={<NoticeIcon />}
                 onClick={() => {
-                  props.setNoticeShow(true);
+                  props.showNotice();
                 }}
                 shadow
               />
@@ -256,7 +358,7 @@ export function SideBar(props: {
           )}
           {!websiteConfigStore.hideGithubIcon ? (
             <div className={styles["sidebar-action"]}>
-              <a href={REPO_URL} target="_blank">
+              <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
                 <IconButton icon={<GithubIcon />} shadow />
               </a>
             </div>
@@ -268,10 +370,18 @@ export function SideBar(props: {
           <IconButton
             icon={<AddIcon />}
             text={shouldNarrow ? undefined : Locale.Home.NewChat}
-            onClick={() => {
+            onClick={async () => {
               if (config.dontShowMaskSplashScreen) {
-                chatStore.newSession();
-                navigate(Path.Chat);
+                const result = await chatStore.newSession(
+                  authStore.token,
+                  () => {
+                    authStore.logout();
+                    navigate(Path.Login);
+                  },
+                );
+                if (result) {
+                  navigate(Path.Chat);
+                }
               } else {
                 navigate(Path.NewChat);
               }
@@ -283,14 +393,19 @@ export function SideBar(props: {
 
       <div
         className={styles["sidebar-drag"]}
-        onMouseDown={(e) => onDragMouseDown(e as any)}
-      ></div>
+        onPointerDown={(e) => onDragStart(e as any)}
+      >
+        <DragIcon />
+      </div>
 
       {props.noticeShow && (
         <NoticeModel
           title={props.noticeTitle}
           content={props.noticeContent}
-          onClose={() => props.setNoticeShow(false)}
+          noticeNotShowToday={props.noticeNotShowToday}
+          onClose={(notShowToday: boolean) =>
+            props.setNoticeShow(false, notShowToday)
+          }
         />
       )}
     </div>

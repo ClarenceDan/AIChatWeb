@@ -26,35 +26,44 @@ const nextConfig = {
       );
     }
 
+    config.resolve.fallback = {
+      child_process: false,
+    };
+
     return config;
   },
   output: mode,
   images: {
     unoptimized: mode === "export",
   },
+  experimental: {
+    forceSwcTransforms: true,
+  },
 };
+
+const CorsHeaders = [
+  { key: "Access-Control-Allow-Credentials", value: "true" },
+  { key: "Access-Control-Allow-Origin", value: "*" },
+  {
+    key: "Access-Control-Allow-Methods",
+    value: "*",
+  },
+  {
+    key: "Access-Control-Allow-Headers",
+    value: "*",
+  },
+  {
+    key: "Access-Control-Max-Age",
+    value: "86400",
+  },
+];
 
 if (mode !== "export") {
   nextConfig.headers = async () => {
     return [
       {
         source: "/api/:path*",
-        headers: [
-          { key: "Access-Control-Allow-Credentials", value: "true" },
-          { key: "Access-Control-Allow-Origin", value: "*" },
-          {
-            key: "Access-Control-Allow-Methods",
-            value: "*",
-          },
-          {
-            key: "Access-Control-Allow-Headers",
-            value: "*",
-          },
-          {
-            key: "Access-Control-Max-Age",
-            value: "86400",
-          },
-        ],
+        headers: CorsHeaders,
       },
     ];
   };
@@ -73,16 +82,11 @@ if (mode !== "export") {
         source: "/sharegpt",
         destination: "https://sharegpt.com/api/conversations",
       },
+      {
+        source: "/:path([A-Za-z\\-]+)",
+        destination: "/",
+      },
     ];
-
-    const apiUrl = process.env.API_URL;
-    if (apiUrl) {
-      console.log("[Next] using api url ", apiUrl);
-      ret.push({
-        source: "/api/:path*",
-        destination: `${apiUrl}/:path*`,
-      });
-    }
 
     return {
       beforeFiles: ret,
